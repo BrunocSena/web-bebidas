@@ -92,7 +92,7 @@ const MenuSidebar = () => {
             />
           </div>
           <div className="info">
-            <Link to="/profile" className="d-block">
+            <Link to="" className="d-block">
               Guilherme
             </Link>
           </div>
