@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +21,15 @@ const Header = () => {
   const handleToggleControlSidebar = () => {
     dispatch(toggleControlSidebar());
   };
+
+  const [estaDark, setEstaDark] = useState(false);
+
+  useEffect(() => {
+    if (!estaDark) {
+      dispatch(toggleDarkMode());
+      setEstaDark(true);
+    }
+  }, []);
 
   const handleDarkModeChange = () => {
     dispatch(toggleDarkMode());
@@ -55,7 +64,8 @@ const Header = () => {
         >
           <button
             onClick={handleDarkModeChange}
-            className="nav-link">
+            className="nav-link"
+            id="setaModoDark">
             Modo Escuro
           </button>
         </li>
