@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleControlSidebar, toggleDarkMode, toggleSidebarMenu } from '@app/store/reducers/ui';
@@ -7,12 +7,22 @@ import MessagesDropdown from '@app/modules/main/header/messages-dropdown/Message
 import NotificationsDropdown from '@app/modules/main/header/notifications-dropdown/NotificationsDropdown';
 import LanguagesDropdown from '@app/modules/main/header/languages-dropdown/LanguagesDropdown';
 import UserDropdown from '@app/modules/main/header/user-dropdown/UserDropdown';
+import { logoutUser } from '@app/store/reducers/auth';
 
 const Header = () => {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const navbarVariant = useSelector((state: any) => state.ui.navbarVariant);
   const headerBorder = useSelector((state: any) => state.ui.headerBorder);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const logOut = (event: any) => {
+    event.preventDefault();
+    setDropdownOpen(false);
+    dispatch(logoutUser());
+    navigate('/login');
+  };
 
   const handleToggleMenuSidebar = () => {
     dispatch(toggleSidebarMenu());
@@ -62,16 +72,13 @@ const Header = () => {
         </li>
       </ul>
       <ul className="navbar-nav ml-auto">
-        <UserDropdown />
-        <li className="nav-item">
-          <button
+        <button
             type="button"
-            className="nav-link"
-            onClick={handleToggleControlSidebar}
+            className="btn btn-info btn-flat float-right"
+            onClick={logOut}
           >
-            <i className="fas fa-th-large" />
+            {t<string>('Sair do Sistema')}
           </button>
-        </li>
       </ul>
     </nav>
   );

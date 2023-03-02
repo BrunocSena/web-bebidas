@@ -136,30 +136,6 @@ const UserDropdown = () => {
         height={25}
         rounded
       />
-      <div slot="menu">
-        <UserHeader className=" bg-primary">
-          <StyledBigUserImage
-            src={user.picture}
-            fallbackSrc="/img/default-profile.png"
-            alt="User"
-            width={90}
-            height={90}
-            rounded
-          />
-          <p>
-            {user.email}
-          </p>
-        </UserHeader>
-        <UserFooter>
-          <button
-            type="button"
-            className="btn btn-default btn-flat float-right"
-            onClick={logOut}
-          >
-            {t<string>('Sair do Sistema')}
-          </button>
-        </UserFooter>
-      </div>
     </StyledDropdown>
   );
 };

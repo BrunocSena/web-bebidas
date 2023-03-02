@@ -8,17 +8,17 @@ const SaidaProduto = () => {
 
   useEffect (() => {
 
-    const btnModoEdicaoEntProduto =  document.getElementById('btnModoEdicaoEntProduto');
+    const btnModoEdicaoSaidaProduto =  document.getElementById('btnModoEdicaoSaidaProduto');
     const btnCancelarModoEdicaoProduto = document.getElementById('btnCancelarModoEdicaoProduto');
 
     if (!estaEditando) {
 
-      btnModoEdicaoEntProduto?.classList.remove('d-none');
+      btnModoEdicaoSaidaProduto?.classList.remove('d-none');
       btnCancelarModoEdicaoProduto?.classList.add('d-none');
 
     } else {
 
-      btnModoEdicaoEntProduto?.classList.add('d-none');
+      btnModoEdicaoSaidaProduto?.classList.add('d-none');
       btnCancelarModoEdicaoProduto?.classList.remove('d-none');
 
     }
@@ -35,7 +35,7 @@ const SaidaProduto = () => {
             <div className="card-body">
               <div className="form-group row col-sm-12">
                 <div className="row col-sm-12">
-                  <label htmlFor="inputsProduto" className="col-sm-12">
+                  <label htmlFor="inputsProdutoSaida" className="col-sm-12">
                     Produto:
                   </label>
                 </div>
@@ -44,7 +44,7 @@ const SaidaProduto = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="inputCodigo"
+                      id="inputCodigoSaidaProduto"
                       placeholder="Código"
                       disabled={true}
                     />
@@ -53,7 +53,7 @@ const SaidaProduto = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="inputsProduto"
+                      id="inputsProdutoSaida"
                       placeholder="Descrição"
                       disabled={true}
                     />
@@ -62,68 +62,44 @@ const SaidaProduto = () => {
               </div>
               <div className="form-group row col-sm-12">
                 <div className="row col-sm-12">
-                  <label htmlFor="inputQtdeUnitaria" className="col-sm-3">
+                  <label htmlFor="inputQtdeUnitariaSaidaProduto" className="col-sm-6">
                     Quantidade Unitária:
                   </label>
-                  <label htmlFor="inputQtdeCaixa" className="col-sm-3">
+                  <label htmlFor="inputQtdeCaixaSaidaProduto" className="col-sm-6">
                     Quantidade em Caixa:
                   </label>
-                  <label htmlFor="inputQtdeCaixa" className="col-sm-3">
-                    Custo Unitário:
-                  </label>
-                  <label htmlFor="inputQtdeCaixa" className="col-sm-3">
-                    Custo em Caixa:
-                  </label>
-                  <div className="col-sm-3">
+                  <div className="col-sm-6">
                     <input
                       type="number"
                       className="form-control"
-                      id="inputQtdeUnitaria"
+                      id="inputQtdeUnitariaSaidaProduto"
                       placeholder="Quantidade Unit."
                       disabled={!estaEditando}
                     />
                   </div>
-                  <div className="col-sm-3">
+                  <div className="col-sm-6">
                     <input
                       type="number"
                       className="form-control"
-                      id="inputQtdeCaixa"
+                      id="inputQtdeCaixaSaidaProduto"
                       placeholder="Quantidade Caixa"
-                      disabled={!estaEditando}
-                    />
-                  </div>
-                  <div className="col-sm-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="inputCustoUnitario"
-                      placeholder="Custo Unit."
-                      disabled={!estaEditando}
-                    />
-                  </div>
-                  <div className="col-sm-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="inputCustoCaixa"
-                      placeholder="Custo em Caixa"
                       disabled={!estaEditando}
                     />
                   </div>
                 </div>
               </div>
-              <label htmlFor="inputsProduto" className="col-sm-6">
+              <label htmlFor="inputBarraSaidaProduto" className="col-sm-6">
                 Barra:
               </label>
-              <label htmlFor="inputsProduto" className="col-sm-6">
-                Tipo Entrada:
+              <label htmlFor="inputTipoSaida" className="col-sm-6">
+                Tipo Saída:
               </label>
               <div className="row col-sm-12">
                 <div className="col-sm-6">
                   <input
                     type="text"
                     className="form-control"
-                    id="inputBarraCadProduto"
+                    id="inputBarraSaidaProduto"
                     placeholder="Barra"
                     disabled={!estaEditando}
                   />
@@ -132,10 +108,10 @@ const SaidaProduto = () => {
                   <input
                     type="text"
                     className="form-control"
-                    id="inputTipoEntrada"
-                    placeholder="Tipo de Entrada do Produto"
+                    id="inputTipoSaida"
+                    placeholder="Tipo de Saída do Produto"
                     disabled={true}
-                    defaultValue="Entrada de Mercadoria"
+                    defaultValue="Saída de Mercadoria"
                   />
                 </div>
               </div>
@@ -143,7 +119,7 @@ const SaidaProduto = () => {
             <div className="card-footer">
               <button
                 className="btn btn-info"
-                id="btnModoEdicaoEntProduto"
+                id="btnModoEdicaoSaidaProduto"
                 onClick={() => {
                   setEstaEditando(true)
                 }}
