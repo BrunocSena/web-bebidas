@@ -6,6 +6,28 @@ const CadProduto = () => {
   const [estaIncluindo, setEstaIncluindo] = useState(false);
   const [estaAlterando, setEstaAlterando] = useState(false);
 
+  useEffect (() => {
+
+    const btnIncluir =  document.getElementById('btnIncluirCadProduto');
+    const btnCancelar = document.getElementById('btnCancelarCadProduto');
+    const btnAlterar = document.getElementById('btnAlterarCadProduto');
+    const btnExcluir = document.getElementById('btnExcluirCadProduto');
+
+    if (!estaAlterando && !estaIncluindo) {
+
+      btnIncluir?.classList.remove('d-none');
+      btnAlterar?.classList.remove('d-none');
+      btnExcluir?.classList.remove('d-none');
+      btnCancelar?.classList.add('d-none');
+
+    } else {
+      btnIncluir?.classList.add('d-none');
+      btnAlterar?.classList.add('d-none');
+      btnExcluir?.classList.add('d-none');
+      btnCancelar?.classList.remove('d-none');
+    }
+  }, [estaAlterando, estaIncluindo])
+
   return (
     <div>
       <ContentHeader title="Cadastro de Produto" />
@@ -34,7 +56,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputCodigo"
                       placeholder="Código"
-                      disabled={!estaIncluindo || !estaAlterando}
+                      disabled={true}
                     />
                   </div>
                   <div className="col-sm-9">
@@ -43,7 +65,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputsProduto"
                       placeholder="Descrição"
-                      disabled={!estaIncluindo || !estaAlterando}
+                      disabled={!estaIncluindo && !estaAlterando}
                     />
                   </div>
                 </div>
@@ -68,7 +90,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputQtdeUnitaria"
                       placeholder="Quantidade Unit."
-                      disabled={!estaIncluindo || !estaAlterando}
+                      disabled={true}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -77,7 +99,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputQtdeCaixa"
                       placeholder="Quantidade Caixa"
-                      disabled={!estaIncluindo || !estaAlterando}
+                      disabled={true}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -86,7 +108,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputPrecoUnit"
                       placeholder="Preço Unitário"
-                      disabled={!estaIncluindo || !estaAlterando}
+                      disabled={!estaIncluindo && !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -95,7 +117,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputPrecoCaixa"
                       placeholder="Preço Caixa"
-                      disabled={!estaIncluindo || !estaAlterando}
+                      disabled={!estaIncluindo && !estaAlterando}
                     />
                   </div>
                 </div>
@@ -114,7 +136,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputCustoUnitario"
                       placeholder="Custo Unit."
-                      disabled={!estaIncluindo || !estaAlterando}
+                      disabled={!estaIncluindo && !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-6">
@@ -123,31 +145,58 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputCustoCaixa"
                       placeholder="Custo em Caixa"
-                      disabled={!estaIncluindo || !estaAlterando}
+                      disabled={!estaIncluindo && !estaAlterando}
                     />
                   </div>
+                </div>
+              </div>
+              <label htmlFor="inputsProduto" className="col-sm-12">
+                Barra:
+              </label>
+              <div className="row col-sm-12">
+                <div className="col-sm-6">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="inputBarraCadProduto"
+                    placeholder="Barra"
+                    disabled={!estaIncluindo && !estaAlterando}
+                  />
                 </div>
               </div>
             </div>
             <div className="card-footer">
               <button
                 className="btn btn-warning mr-1"
+                id="btnIncluirCadProduto"
                 onClick={() => {
                   setEstaIncluindo(true)
                 }}
-                >
+              >
                 Incluir
               </button>
               <button
                 className="btn btn-info mr-1"
+                id="btnAlterarCadProduto"
                 onClick={() => {
                   setEstaAlterando(true)
                 }}
-                >
+              >
                 Alterar
               </button>
               <button
-                className="btn btn-danger btn-md mr-1">
+                className="btn btn-danger mr-1 d-none"
+                id="btnCancelarCadProduto"
+                onClick={() => {
+                  setEstaAlterando(false);
+                  setEstaIncluindo(false);
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                id="btnExcluirCadProduto"
+                className="btn btn-dark mr-1">
                 Excluir
               </button>
             </div>
