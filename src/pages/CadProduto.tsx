@@ -150,7 +150,7 @@ const CadProduto = () => {
                   </div>
                 </div>
               </div>
-              <label htmlFor="inputsProduto" className="col-sm-12">
+              <label htmlFor="inputBarraCadProduto" className="col-sm-12">
                 Barra:
               </label>
               <div className="row col-sm-12">

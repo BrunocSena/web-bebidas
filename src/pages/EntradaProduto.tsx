@@ -35,7 +35,7 @@ const EntradaProduto = () => {
             <div className="card-body">
               <div className="form-group row col-sm-12">
                 <div className="row col-sm-12">
-                  <label htmlFor="inputsProduto" className="col-sm-12">
+                  <label htmlFor="inputCodigoEntradaProduto" className="col-sm-12">
                     Produto:
                   </label>
                 </div>
@@ -44,7 +44,7 @@ const EntradaProduto = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="inputCodigo"
+                      id="inputCodigoEntradaProduto"
                       placeholder="Código"
                       disabled={true}
                     />
@@ -53,7 +53,7 @@ const EntradaProduto = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="inputsProduto"
+                      id="inputsProdutoEntradaProduto"
                       placeholder="Descrição"
                       disabled={true}
                     />
@@ -62,23 +62,23 @@ const EntradaProduto = () => {
               </div>
               <div className="form-group row col-sm-12">
                 <div className="row col-sm-12">
-                  <label htmlFor="inputQtdeUnitaria" className="col-sm-3">
+                  <label htmlFor="inputQtdeUnitariaEntradaProduto" className="col-sm-3">
                     Quantidade Unitária:
                   </label>
-                  <label htmlFor="inputQtdeCaixa" className="col-sm-3">
+                  <label htmlFor="inputQtdeCaixaEntradaProduto" className="col-sm-3">
                     Quantidade em Caixa:
                   </label>
-                  <label htmlFor="inputQtdeCaixa" className="col-sm-3">
+                  <label htmlFor="inputCustoUnitarioEntradaProduto" className="col-sm-3">
                     Custo Unitário:
                   </label>
-                  <label htmlFor="inputQtdeCaixa" className="col-sm-3">
+                  <label htmlFor="inputCustoCaixaEntradaProduto" className="col-sm-3">
                     Custo em Caixa:
                   </label>
                   <div className="col-sm-3">
                     <input
                       type="number"
                       className="form-control"
-                      id="inputQtdeUnitaria"
+                      id="inputQtdeUnitariaEntradaProduto"
                       placeholder="Quantidade Unit."
                       disabled={!estaEditando}
                     />
@@ -87,7 +87,7 @@ const EntradaProduto = () => {
                     <input
                       type="number"
                       className="form-control"
-                      id="inputQtdeCaixa"
+                      id="inputQtdeCaixaEntradaProduto"
                       placeholder="Quantidade Caixa"
                       disabled={!estaEditando}
                     />
@@ -96,7 +96,7 @@ const EntradaProduto = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="inputCustoUnitario"
+                      id="inputCustoUnitarioEntradaProduto"
                       placeholder="Custo Unit."
                       disabled={!estaEditando}
                     />
@@ -105,17 +105,17 @@ const EntradaProduto = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="inputCustoCaixa"
+                      id="inputCustoCaixaEntradaProduto"
                       placeholder="Custo em Caixa"
                       disabled={!estaEditando}
                     />
                   </div>
                 </div>
               </div>
-              <label htmlFor="inputsProduto" className="col-sm-6">
+              <label htmlFor="inputBarraEntradaProduto" className="col-sm-6">
                 Barra:
               </label>
-              <label htmlFor="inputsProduto" className="col-sm-6">
+              <label htmlFor="inputTipoEntrada" className="col-sm-6">
                 Tipo Entrada:
               </label>
               <div className="row col-sm-12">
@@ -123,7 +123,7 @@ const EntradaProduto = () => {
                   <input
                     type="text"
                     className="form-control"
-                    id="inputBarraCadProduto"
+                    id="inputBarraEntradaProduto"
                     placeholder="Barra"
                     disabled={!estaEditando}
                   />
@@ -142,13 +142,13 @@ const EntradaProduto = () => {
             </div>
             <div className="card-footer">
               <button
-                className="btn btn-warning"
+                className="btn btn-info"
                 id="btnModoEdicaoEntProduto"
                 onClick={() => {
                   setEstaEditando(true)
                 }}
               >
-                Incluir
+                Modo Edição
               </button>
               <button
                 className="btn btn-danger d-none"

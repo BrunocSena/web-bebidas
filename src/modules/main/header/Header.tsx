@@ -60,15 +60,6 @@ const Header = () => {
             {t<string>('header.label.home')}
           </Link>
         </li>
-        <li className="nav-item d-none d-sm-inline-block"
-        >
-          <button
-            onClick={handleDarkModeChange}
-            className="nav-link"
-            id="setaModoDark">
-            Modo Escuro
-          </button>
-        </li>
       </ul>
       <ul className="navbar-nav ml-auto">
         <UserDropdown />
