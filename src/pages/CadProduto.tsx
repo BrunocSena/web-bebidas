@@ -1,14 +1,17 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ContentHeader } from '@components';
 
 const CadProduto = () => {
+
+  const [estaIncluindo, setEstaIncluindo] = useState(false);
+  const [estaAlterando, setEstaAlterando] = useState(false);
+
   return (
     <div>
       <ContentHeader title="Cadastro de Produto" />
       <section className="content">
         <div className="container-fluid">
-          <div className='row' style={{marginLeft: 1}}>
+          <div className='row' style={{ marginLeft: 1 }}>
             <div className='input-group'>
               <input
                 className="form-control col-sm-2 mb-1">
@@ -17,28 +20,6 @@ const CadProduto = () => {
             </div>
           </div>
           <div className="card">
-            <div className="card-header">
-              <div className="card-tools">
-                <button
-                  type="button"
-                  className="btn btn-tool"
-                  data-widget="collapse"
-                  data-toggle="tooltip"
-                  title="Collapse"
-                >
-                  <i className="fa fa-minus" />
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-tool"
-                  data-widget="remove"
-                  data-toggle="tooltip"
-                  title="Remove"
-                >
-                  <i className="fa fa-times" />
-                </button>
-              </div>
-            </div>
             <div className="card-body">
               <div className="form-group row col-sm-12">
                 <div className="row col-sm-12">
@@ -53,7 +34,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputCodigo"
                       placeholder="Código"
-                      disabled={true}
+                      disabled={!estaIncluindo || !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-9">
@@ -62,6 +43,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputsProduto"
                       placeholder="Descrição"
+                      disabled={!estaIncluindo || !estaAlterando}
                     />
                   </div>
                 </div>
@@ -86,6 +68,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputQtdeUnitaria"
                       placeholder="Quantidade Unit."
+                      disabled={!estaIncluindo || !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -94,6 +77,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputQtdeCaixa"
                       placeholder="Quantidade Caixa"
+                      disabled={!estaIncluindo || !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -102,6 +86,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputPrecoUnit"
                       placeholder="Preço Unitário"
+                      disabled={!estaIncluindo || !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -110,6 +95,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputPrecoCaixa"
                       placeholder="Preço Caixa"
+                      disabled={!estaIncluindo || !estaAlterando}
                     />
                   </div>
                 </div>
@@ -128,6 +114,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputCustoUnitario"
                       placeholder="Custo Unit."
+                      disabled={!estaIncluindo || !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-6">
@@ -136,6 +123,7 @@ const CadProduto = () => {
                       className="form-control"
                       id="inputCustoCaixa"
                       placeholder="Custo em Caixa"
+                      disabled={!estaIncluindo || !estaAlterando}
                     />
                   </div>
                 </div>
@@ -143,11 +131,19 @@ const CadProduto = () => {
             </div>
             <div className="card-footer">
               <button
-                className="btn btn-warning mr-1">
+                className="btn btn-warning mr-1"
+                onClick={() => {
+                  setEstaIncluindo(true)
+                }}
+                >
                 Incluir
               </button>
               <button
-                className="btn btn-info mr-1">
+                className="btn btn-info mr-1"
+                onClick={() => {
+                  setEstaAlterando(true)
+                }}
+                >
                 Alterar
               </button>
               <button
