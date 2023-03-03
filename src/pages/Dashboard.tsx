@@ -20,9 +20,6 @@ const Dashboard = () => {
                 <div className="icon">
                   <i className="ion ion-bag" />
                 </div>
-                <a href="/" className="small-box-footer">
-                  More info <i className="fas fa-arrow-circle-right" />
-                </a>
               </div>
             </div>
             <div className="col-lg-3 col-6">
@@ -35,9 +32,6 @@ const Dashboard = () => {
                 <div className="icon">
                   <i className="ion ion-social-usd" />
                 </div>
-                <a href="/" className="small-box-footer">
-                  More info <i className="fas fa-arrow-circle-right" />
-                </a>
               </div>
             </div>
           </div>
