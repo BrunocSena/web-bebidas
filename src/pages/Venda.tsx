@@ -83,7 +83,7 @@ const Venda = () => {
                   </div>
                 </div>
               </div>
-              <table id="tabelaItensVenda" className="table table-lg-responsive" style={{ whiteSpace: 'nowrap' }}>
+              <table id="tabelaItensVenda" className="table table-lg-responsive" style={{ whiteSpace: 'nowrap', backgroundColor: '#2e2e2e' }}>
                 <thead>
                   <th>Produto</th>
                   <th>Qtde Unit.</th>
@@ -93,6 +93,14 @@ const Venda = () => {
                   <th>Valor Total</th>
                 </thead>
                 <tbody>
+                  <tr>
+                    <td>Coca Cola 2L PACK FECHADO</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>12,00</td>
+                    <td>42,00</td>
+                    <td>56,00</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
