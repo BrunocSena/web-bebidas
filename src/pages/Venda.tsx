@@ -3,29 +3,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ContentHeader } from '@components';
 
 const Venda = () => {
-
-  const [barraProduto, setBarraProduto] = useState('');
-  const [qtdeUnitaria, setQtdeUnitaria] = useState(0);
-  const [qtdeCaixas, setQtdeCaixas] = useState(0);
-  const [descontoValor, setDescontoValorItem] = useState(0);
-  const [descontoPorcentagem, setDescontoPorcetagemItem] = useState(0);
-  const [acrescimoValor, setAcrescimoValorItem] = useState(0);
-  const [acrescimoPorcentagem, setAcrescimoPorcentagemItem] = useState(0);
-  const [descricaoItem, setDescricaoItem] = useState('');
-  const [precoUnitarioItem, setPrecoUnitarioItem] = useState(0);
-  const [precoCaixaItem, setPrecoCaixaItem] = useState(0);
-
-  const pegaInfosProduto = () => {
-
-    const txtDescricaoProd = document.getElementById('txtDescricaoProduto') as HTMLInputElement;
-    const txtPrecoUnitario = document.getElementById('txtPrecoUnitario') as HTMLInputElement;
-    const txtPrecoCaixa = document.getElementById('txtPrecoCaixas') as HTMLInputElement;
-
-    setDescricaoItem(txtDescricaoProd.value);
-    setPrecoCaixaItem(+txtPrecoUnitario.value);
-    setPrecoUnitarioItem(+txtPrecoCaixa.value);
-    
-  };
+  const inputDescricaoItem = useRef<HTMLInputElement>(null);
+  const inputPrecoUnitarioItem = useRef<HTMLInputElement>(null);
+  const inputPrecoCaixaItem = useRef<HTMLInputElement>(null);
+  const inputBarraProduto = useRef<HTMLInputElement>(null);
+  const qtdeUnitariaDoItem = useRef<HTMLInputElement>(null);
+  const qtdeCaixaDoItem = useRef<HTMLInputElement>(null);
+  const descontoValorDoItem = useRef<HTMLInputElement>(null);
+  const descontoPorcentagemDoItem = useRef<HTMLInputElement>(null);
+  const acrescimoValorDoItem = useRef<HTMLInputElement>(null);
+  const acrescimoPorcentagemDoItem = useRef<HTMLInputElement>(null);
 
   function addInfoDataTable(data: any[]) {
 
@@ -40,37 +27,38 @@ const Venda = () => {
     myTableItensVenda.appendChild(myTableItensVendaBody)
   };
 
-  const adicionaItem = () => {
-    const maisItem = [descricaoItem, qtdeUnitaria, qtdeCaixas, precoUnitarioItem.toFixed(2).replace('.', ','), precoCaixaItem.toFixed(2).replace('.', ','), '86,00'];
+  const adicionaItem = async () => {
+    const descricaoDoItem = inputDescricaoItem.current?.value;
+    const precoUnitarioDoItem = inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0');
+    const qtdeUnitariaItem = qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0');
+    const qtdeCaixaItem = qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0');
+
+    if (qtdeUnitariaItem == 0 && qtdeCaixaItem == 0) {
+      alert('Produto não existe quantidade informada! Verifique.');
+      return;
+    };
+
+    const precoCaixaDoItem = inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0');
+    const descontoPorcentagemItem = descontoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(descontoPorcentagemDoItem.current?.value ?? '0');
+    const descontoValorItem = descontoValorDoItem.current?.value == '' ? 0 : parseFloat(descontoValorDoItem.current?.value ?? '0');
+    const valorTotDoItem = await calculaValorTotal(qtdeUnitariaItem, precoUnitarioDoItem, qtdeCaixaItem, precoCaixaDoItem, descontoPorcentagemItem, descontoValorItem);
+    const maisItem = [descricaoDoItem, qtdeUnitariaItem, qtdeCaixaItem, precoUnitarioDoItem.toFixed(2).replace('.', ','), precoCaixaDoItem.toFixed(2).replace('.', ','), valorTotDoItem.toFixed(2).replace('.', ',')];
     addInfoDataTable(maisItem)
   };
 
-  const handleBarraProduto = (barraProduto: string) => {
-    setBarraProduto(barraProduto);
-  };
-
-  const handleQtdeUnitaria = (qtdeUnit: number) => {
-    setQtdeUnitaria(qtdeUnit);
-  };
-
-  const handleQtdeCaixas = (qtdeCx: number) => {
-    setQtdeCaixas(qtdeCx);
-  };
-
-  const handleDescontoValorItem = (descValorItem: number) => {
-    setDescontoValorItem(descValorItem);
-  };
-
-  const handleDescontoPorcentagemItem = (descPorcentagemItem: number) => {
-    setDescontoPorcetagemItem(descPorcentagemItem);
-  };
-
-  const handleAcrescimoValorItem = (acrescValorItem: number) => {
-    setAcrescimoValorItem(acrescValorItem);
-  };
-
-  const handleAcrescimoPorcentagemItem = (acrescPorcentagemItem: number) => {
-    setAcrescimoPorcentagemItem(acrescPorcentagemItem);
+  async function calculaValorTotal(qtdeUnitaria: number,
+    precoUnitarioItem: number,
+    qtdeCaixas: number,
+    precoCaixaItem: number,
+    descontoPorcentagemItem: number,
+    descontoValorItem: number) {
+    const totSemDescontoUnitario = (qtdeUnitaria * precoUnitarioItem);
+    const totSemDescontoCaixa = (qtdeCaixas * precoCaixaItem);
+    const totSemDesconto = (totSemDescontoCaixa + totSemDescontoUnitario);
+    const totValorDescPorcentagemItem = (totSemDesconto * (descontoPorcentagemItem / 100));
+    const totDesconto = descontoValorItem + totValorDescPorcentagemItem;
+    const totValorComDesconto = (totSemDesconto - totDesconto);
+    return totValorComDesconto;
   };
 
   return (
@@ -98,14 +86,12 @@ const Venda = () => {
                     <input
                       className='form-control'
                       value="987654321"
-                      onBlur={(event) => {
-                        handleBarraProduto(event.target.value)
-                      }}
+                      ref={inputBarraProduto}
                       id="txtBarraProduto"
                       type="text" />
                   </div>
                   <div className='col-sm-9'>
-                    <input className='form-control' id="txtDescricaoProduto" type="text" />
+                    <input className='form-control' ref={inputDescricaoItem} id="txtDescricaoProduto" type="text" />
                   </div>
                 </div>
               </div>
@@ -124,16 +110,16 @@ const Venda = () => {
                     Preço Caixa:
                   </label>
                   <div className='col-sm-3'>
-                    <input className='form-control' onBlur={(event) => { handleQtdeUnitaria(+event.target.value), pegaInfosProduto() }} id="txtQtdeUnitaria" type="number" />
+                    <input className='form-control' ref={qtdeUnitariaDoItem} id="txtQtdeUnitaria" type="number" />
                   </div>
                   <div className='col-sm-3'>
-                    <input className='form-control' onBlur={(event) => { handleQtdeCaixas(+event.target.value),   pegaInfosProduto() }} id="txtQtdeCaixas" type="number" />
+                    <input className='form-control' ref={qtdeCaixaDoItem} id="txtQtdeCaixas" type="number" />
                   </div>
                   <div className='col-sm-3'>
-                    <input className='form-control'  disabled={true} value="12.35" id="txtPrecoUnitario" type="number" />
+                    <input className='form-control' disabled={true} ref={inputPrecoUnitarioItem} value="10" id="txtPrecoUnitario" type="number" />
                   </div>
                   <div className='col-sm-3'>
-                    <input className='form-control'  disabled={true} value="63.14" id="txtPrecoCaixas" type="number" />
+                    <input className='form-control' disabled={true} ref={inputPrecoCaixaItem} value="60" id="txtPrecoCaixas" type="number" />
                   </div>
                 </div>
               </div>
@@ -152,16 +138,16 @@ const Venda = () => {
                     Acréscimo(%):
                   </label>
                   <div className='col-sm-3'>
-                    <input className='form-control' onBlur={(event) => { handleDescontoValorItem(+event.target.value) }} id="txtDescontoValor" type="number" />
+                    <input className='form-control' ref={descontoValorDoItem} id="txtDescontoValor" type="number" />
                   </div>
                   <div className='col-sm-3'>
-                    <input className='form-control' onBlur={(event) => { handleDescontoPorcentagemItem(+event.target.value) }} id="txtDescontoPorcentagem" type="number" />
+                    <input className='form-control' ref={descontoPorcentagemDoItem} id="txtDescontoPorcentagem" type="number" />
                   </div>
                   <div className='col-sm-3'>
-                    <input className='form-control mt-1' onBlur={(event) => { handleAcrescimoValorItem(+event.target.value) }} id="txtAcrescimoValor" type="number" />
+                    <input className='form-control mt-1' ref={acrescimoValorDoItem} id="txtAcrescimoValor" type="number" />
                   </div>
                   <div className='col-sm-3'>
-                    <input className='form-control mt-1' onBlur={(event) => { handleAcrescimoPorcentagemItem(+event.target.value) }} id="txtAcrescimoPorcentagem" type="number" />
+                    <input className='form-control mt-1' ref={acrescimoPorcentagemDoItem} id="txtAcrescimoPorcentagem" type="number" />
                   </div>
                 </div>
               </div>
@@ -170,9 +156,7 @@ const Venda = () => {
                   <div className='col-sm-6'>
                     <button
                       className="btn btn-info btn-lg pb-1 mr-2"
-                      onClick={() => {
-                        adicionaItem()
-                      }}
+                      onClick={async () => { adicionaItem() }}
                       id="btnAdicionaItem">
                       Adicionar Item
                     </button>
