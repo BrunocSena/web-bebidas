@@ -41,7 +41,9 @@ const Venda = () => {
     const precoCaixaDoItem = inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0');
     const descontoPorcentagemItem = descontoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(descontoPorcentagemDoItem.current?.value ?? '0');
     const descontoValorItem = descontoValorDoItem.current?.value == '' ? 0 : parseFloat(descontoValorDoItem.current?.value ?? '0');
-    const valorTotDoItem = await calculaValorTotal(qtdeUnitariaItem, precoUnitarioDoItem, qtdeCaixaItem, precoCaixaDoItem, descontoPorcentagemItem, descontoValorItem);
+    const acrescValorItem = acrescimoValorDoItem.current?.value == '' ? 0 : parseFloat(acrescimoValorDoItem.current?.value ?? '0');
+    const acrescPercItem = acrescimoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(acrescimoPorcentagemDoItem.current?.value ?? '0');
+    const valorTotDoItem = await calculaValorTotal(qtdeUnitariaItem, precoUnitarioDoItem, qtdeCaixaItem, precoCaixaDoItem, descontoPorcentagemItem, descontoValorItem, acrescValorItem, acrescPercItem);
     const maisItem = [descricaoDoItem, qtdeUnitariaItem, qtdeCaixaItem, precoUnitarioDoItem.toFixed(2).replace('.', ','), precoCaixaDoItem.toFixed(2).replace('.', ','), valorTotDoItem.toFixed(2).replace('.', ',')];
     addInfoDataTable(maisItem)
   };
@@ -51,13 +53,17 @@ const Venda = () => {
     qtdeCaixas: number,
     precoCaixaItem: number,
     descontoPorcentagemItem: number,
-    descontoValorItem: number) {
+    descontoValorItem: number,
+    acrescimoValorItem: number,
+    acrescimoPorcenItem: number) {
     const totSemDescontoUnitario = (qtdeUnitaria * precoUnitarioItem);
     const totSemDescontoCaixa = (qtdeCaixas * precoCaixaItem);
     const totSemDesconto = (totSemDescontoCaixa + totSemDescontoUnitario);
     const totValorDescPorcentagemItem = (totSemDesconto * (descontoPorcentagemItem / 100));
-    const totDesconto = descontoValorItem + totValorDescPorcentagemItem;
-    const totValorComDesconto = (totSemDesconto - totDesconto);
+    const totValorAcrescPorcentagemItem = (totSemDesconto * (acrescimoPorcenItem / 100));
+    const totAcrescimo = (acrescimoValorItem + totValorAcrescPorcentagemItem)
+    const totDesconto = (descontoValorItem + totValorDescPorcentagemItem);
+    const totValorComDesconto = ((totSemDesconto + totAcrescimo) - totDesconto);
     return totValorComDesconto;
   };
 
