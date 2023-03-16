@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useRef, useState } from 'react';
 import { ContentHeader } from '@components';
+import { Nav } from 'react-bootstrap';
+import { SelectCallback } from 'react-bootstrap/esm/helpers';
 
 const Venda = () => {
   const inputDescricaoItem = useRef<HTMLInputElement>(null);
@@ -13,6 +15,19 @@ const Venda = () => {
   const descontoPorcentagemDoItem = useRef<HTMLInputElement>(null);
   const acrescimoValorDoItem = useRef<HTMLInputElement>(null);
   const acrescimoPorcentagemDoItem = useRef<HTMLInputElement>(null);
+  const [totalValorLiqTudo, setTotalValorLiq] = useState(0);
+  const [totalDescontoTudo, setTotalValorDesc] = useState(0);
+  const [totalAcrescimo, setTotalAcrescimo] = useState(0);
+  const [totalQtdeUnitTudo, setTotalQtdeUnit] = useState(0);
+  const [totalQtdeCaixasTudo, setTotalQtdeCaixas] = useState(0);
+  const [totalValorBrutoTudo, setTotalValorBruto] = useState(0);
+  const [activeTab, setActiveTab] = useState("tab1");
+
+  const handleTabSelect = (selectedTab: any) => {
+    if (selectedTab) {
+      setActiveTab(selectedTab);
+    };
+  };
 
   function addInfoDataTable(data: any[]) {
 
@@ -25,6 +40,21 @@ const Venda = () => {
       itemNovo.innerHTML = itemVenda;
     });
     myTableItensVenda.appendChild(myTableItensVendaBody)
+  };
+
+  async function atualizaTotais(totalAcresc: number, totalDesconto: number, totalValorBruto: number, totalValorLiq: number, totalQtdeUnit: number, totalQtdeCaixas: number) {
+    const totListaItensAcresc = (totalAcresc + totalAcrescimo);
+    const totListaItensDesc = (totalDesconto + totalDescontoTudo);
+    const totValorBruto = (totalValorBruto + totalValorBrutoTudo);
+    const totValorLiq = (totalValorLiq + totalValorLiqTudo);
+    const totQtdeUnit = (totalQtdeUnit + totalQtdeUnitTudo);
+    const totQtdeCaixas = (totalQtdeCaixas + totalQtdeCaixasTudo);
+    setTotalQtdeUnit(+totQtdeUnit);
+    setTotalQtdeCaixas(+totQtdeCaixas);
+    setTotalValorBruto(+totValorBruto);
+    setTotalAcrescimo(+totListaItensAcresc);
+    setTotalValorDesc(+totListaItensDesc);
+    setTotalValorLiq(+totValorLiq);
   };
 
   const adicionaItem = async () => {
@@ -61,9 +91,10 @@ const Venda = () => {
     const totSemDesconto = (totSemDescontoCaixa + totSemDescontoUnitario);
     const totValorDescPorcentagemItem = (totSemDesconto * (descontoPorcentagemItem / 100));
     const totValorAcrescPorcentagemItem = (totSemDesconto * (acrescimoPorcenItem / 100));
-    const totAcrescimo = (acrescimoValorItem + totValorAcrescPorcentagemItem)
+    const totAcrescimo = (acrescimoValorItem + totValorAcrescPorcentagemItem);
     const totDesconto = (descontoValorItem + totValorDescPorcentagemItem);
     const totValorComDesconto = ((totSemDesconto + totAcrescimo) - totDesconto);
+    await atualizaTotais(totAcrescimo, totDesconto, totSemDesconto, totValorComDesconto, qtdeUnitaria, qtdeCaixas);
     return totValorComDesconto;
   };
 
@@ -80,117 +111,207 @@ const Venda = () => {
               </div>
             </div>
             <div className="card-body">
-              <div className="form-group row col-sm-12">
-                <div className="row col-sm-12">
-                  <label htmlFor='inputCodigoProd' className='col-sm-3'>
-                    Barra:
-                  </label>
-                  <label htmlFor='inputCodigoProd' className='col-sm-9'>
-                    Produto:
-                  </label>
-                  <div className='col-sm-3'>
-                    <input
-                      className='form-control'
-                      value="987654321"
-                      ref={inputBarraProduto}
-                      id="txtBarraProduto"
-                      type="text" />
+              {activeTab === 'tab1' && (
+                <div>
+                  <div className="form-group row col-sm-12">
+                    <div className="row col-sm-12">
+                      <label htmlFor='inputCodigoProd' className='col-sm-3'>
+                        Barra:
+                      </label>
+                      <label htmlFor='inputCodigoProd' className='col-sm-9'>
+                        Produto:
+                      </label>
+                      <div className='col-sm-3'>
+                        <input
+                          className='form-control'
+                          value="987654321"
+                          ref={inputBarraProduto}
+                          id="txtBarraProduto"
+                          type="text" />
+                      </div>
+                      <div className='col-sm-9'>
+                        <input className='form-control' ref={inputDescricaoItem} id="txtDescricaoProduto" type="text" />
+                      </div>
+                    </div>
                   </div>
-                  <div className='col-sm-9'>
-                    <input className='form-control' ref={inputDescricaoItem} id="txtDescricaoProduto" type="text" />
+                  <div className="form-group row col-sm-12">
+                    <div className="row col-sm-12">
+                      <label htmlFor='txtQtdeUnitaria' className='col-sm-3'>
+                        Qtde Unitária:
+                      </label>
+                      <label htmlFor='txtQtdeCaixas' className='col-sm-3'>
+                        Qtde em Caixas:
+                      </label>
+                      <label htmlFor='txtPrecoUnitario' className='col-sm-3'>
+                        Preço Unitário:
+                      </label>
+                      <label htmlFor='txtPrecoCaixas' className='col-sm-3'>
+                        Preço Caixa:
+                      </label>
+                      <div className='col-sm-3'>
+                        <input className='form-control' ref={qtdeUnitariaDoItem} id="txtQtdeUnitaria" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control' ref={qtdeCaixaDoItem} id="txtQtdeCaixas" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control' disabled={true} ref={inputPrecoUnitarioItem} value="10" id="txtPrecoUnitario" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control' disabled={true} ref={inputPrecoCaixaItem} value="60" id="txtPrecoCaixas" type="number" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='form-group row col-sm-12'>
+                    <div className='row col-sm-12'>
+                      <label htmlFor='txtDescontoValor' className='col-sm-3'>
+                        Desconto(R$):
+                      </label>
+                      <label htmlFor='txtDescontoPorcentagem' className='col-sm-3'>
+                        Desconto(%):
+                      </label>
+                      <label htmlFor='txtAcrescimoValor' className='col-sm-3'>
+                        Acréscimo(R$):
+                      </label>
+                      <label htmlFor='txtAcrescimoPorcentagem' className='col-sm-3'>
+                        Acréscimo(%):
+                      </label>
+                      <div className='col-sm-3'>
+                        <input className='form-control mt-1' ref={descontoValorDoItem} id="txtDescontoValor" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control mt-1' ref={descontoPorcentagemDoItem} id="txtDescontoPorcentagem" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control mt-1' ref={acrescimoValorDoItem} id="txtAcrescimoValor" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control mt-1' ref={acrescimoPorcentagemDoItem} id="txtAcrescimoPorcentagem" type="number" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="form-group row col-sm-12">
+                    <div className="row col-sm-12">
+                      <div className='col-sm-6'>
+                        <button
+                          className="btn btn-info btn-lg pb-1 mr-2"
+                          onClick={async () => { adicionaItem() }}
+                          id="btnAdicionaItem">
+                          Adicionar Item
+                        </button>
+                        <button className="btn btn-danger btn-lg pb-1" id="btnExcluiItem">Excluir Item</button>
+                      </div>
+                    </div>
+                  </div>
+                  <table id="tabelaItensVenda" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>
+                    <thead>
+                      <th>Produto</th>
+                      <th>Qtde Unit.</th>
+                      <th>Qtde Caixas</th>
+                      <th>Preço Unit.</th>
+                      <th>Preço Caixas</th>
+                      <th>Valor Total</th>
+                    </thead>
+                    <tbody id="tabelaTBody">
+                      <tr>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {activeTab === "tab2" && (
+                <div>
+                  <div className="form-group row col-sm-12">
+                    <div className="row col-sm-12">
+                      <label htmlFor='txtQtdeUnitaria' className='col-sm-3'>
+                        Qtde Unitária:
+                      </label>
+                      <label htmlFor='txtQtdeCaixas' className='col-sm-3'>
+                        Qtde em Caixas:
+                      </label>
+                      <label htmlFor='txtPrecoUnitario' className='col-sm-3'>
+                        Preço Unitário:
+                      </label>
+                      <label htmlFor='txtPrecoCaixas' className='col-sm-3'>
+                        Preço Caixa:
+                      </label>
+                      <div className='col-sm-3'>
+                        <input className='form-control' ref={qtdeUnitariaDoItem} id="txtQtdeUnitaria" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control' ref={qtdeCaixaDoItem} id="txtQtdeCaixas" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control' disabled={true} ref={inputPrecoUnitarioItem} value="10" id="txtPrecoUnitario" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control' disabled={true} ref={inputPrecoCaixaItem} value="60" id="txtPrecoCaixas" type="number" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='form-group row col-sm-12'>
+                    <div className='row col-sm-12'>
+                      <label htmlFor='txtDescontoValor' className='col-sm-3'>
+                        Desconto(R$):
+                      </label>
+                      <label htmlFor='txtDescontoPorcentagem' className='col-sm-3'>
+                        Desconto(%):
+                      </label>
+                      <label htmlFor='txtAcrescimoValor' className='col-sm-3'>
+                        Acréscimo(R$):
+                      </label>
+                      <label htmlFor='txtAcrescimoPorcentagem' className='col-sm-3'>
+                        Acréscimo(%):
+                      </label>
+                      <div className='col-sm-3'>
+                        <input className='form-control mt-1' ref={descontoValorDoItem} id="txtDescontoValor" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control mt-1' ref={descontoPorcentagemDoItem} id="txtDescontoPorcentagem" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control mt-1' ref={acrescimoValorDoItem} id="txtAcrescimoValor" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
+                        <input className='form-control mt-1' ref={acrescimoPorcentagemDoItem} id="txtAcrescimoPorcentagem" type="number" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="form-group row col-sm-12">
+                    <div className="row col-sm-12">
+                      <div className='col-sm-6'>
+                        <button
+                          className="btn btn-info btn-lg pb-1 mr-2"
+                          onClick={async () => { adicionaItem() }}
+                          id="btnAdicionaItem">
+                          Adicionar Item
+                        </button>
+                        <button className="btn btn-danger btn-lg pb-1" id="btnExcluiItem">Excluir Item</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="form-group row col-sm-12">
-                <div className="row col-sm-12">
-                  <label htmlFor='txtQtdeUnitaria' className='col-sm-3'>
-                    Qtde Unitária:
-                  </label>
-                  <label htmlFor='txtQtdeCaixas' className='col-sm-3'>
-                    Qtde em Caixas:
-                  </label>
-                  <label htmlFor='txtPrecoUnitario' className='col-sm-3'>
-                    Preço Unitário:
-                  </label>
-                  <label htmlFor='txtPrecoCaixas' className='col-sm-3'>
-                    Preço Caixa:
-                  </label>
-                  <div className='col-sm-3'>
-                    <input className='form-control' ref={qtdeUnitariaDoItem} id="txtQtdeUnitaria" type="number" />
-                  </div>
-                  <div className='col-sm-3'>
-                    <input className='form-control' ref={qtdeCaixaDoItem} id="txtQtdeCaixas" type="number" />
-                  </div>
-                  <div className='col-sm-3'>
-                    <input className='form-control' disabled={true} ref={inputPrecoUnitarioItem} value="10" id="txtPrecoUnitario" type="number" />
-                  </div>
-                  <div className='col-sm-3'>
-                    <input className='form-control' disabled={true} ref={inputPrecoCaixaItem} value="60" id="txtPrecoCaixas" type="number" />
-                  </div>
-                </div>
-              </div>
-              <div className='form-group row col-sm-12'>
-                <div className='row col-sm-12'>
-                  <label htmlFor='txtDescontoValor' className='col-sm-3'>
-                    Desconto(R$):
-                  </label>
-                  <label htmlFor='txtDescontoPorcentagem' className='col-sm-3'>
-                    Desconto(%):
-                  </label>
-                  <label htmlFor='txtAcrescimoValor' className='col-sm-3'>
-                    Acréscimo(R$):
-                  </label>
-                  <label htmlFor='txtAcrescimoPorcentagem' className='col-sm-3'>
-                    Acréscimo(%):
-                  </label>
-                  <div className='col-sm-3'>
-                    <input className='form-control' ref={descontoValorDoItem} id="txtDescontoValor" type="number" />
-                  </div>
-                  <div className='col-sm-3'>
-                    <input className='form-control' ref={descontoPorcentagemDoItem} id="txtDescontoPorcentagem" type="number" />
-                  </div>
-                  <div className='col-sm-3'>
-                    <input className='form-control mt-1' ref={acrescimoValorDoItem} id="txtAcrescimoValor" type="number" />
-                  </div>
-                  <div className='col-sm-3'>
-                    <input className='form-control mt-1' ref={acrescimoPorcentagemDoItem} id="txtAcrescimoPorcentagem" type="number" />
-                  </div>
-                </div>
-              </div>
-              <div className="form-group row col-sm-12">
-                <div className="row col-sm-12">
-                  <div className='col-sm-6'>
-                    <button
-                      className="btn btn-info btn-lg pb-1 mr-2"
-                      onClick={async () => { adicionaItem() }}
-                      id="btnAdicionaItem">
-                      Adicionar Item
-                    </button>
-                    <button className="btn btn-danger btn-lg pb-1" id="btnExcluiItem">Excluir Item</button>
-                  </div>
-                </div>
-              </div>
-              <table id="tabelaItensVenda" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>
-                <thead>
-                  <th>Produto</th>
-                  <th>Qtde Unit.</th>
-                  <th>Qtde Caixas</th>
-                  <th>Preço Unit.</th>
-                  <th>Preço Caixas</th>
-                  <th>Valor Total</th>
-                </thead>
-                <tbody id="tabelaTBody">
-                  <tr>
-                  </tr>
-                </tbody>
-              </table>
+              )}
             </div>
-            <div className="card-footer">Footer</div>
+            <div className="card-footer">
+              <Nav variant="tabs" activeKey={activeTab} onSelect={handleTabSelect}>
+                <Nav.Item>
+                  <Nav.Link eventKey="tab1" style={{ color: "white" }} href="#">
+                    Itens da Venda
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="tab2" style={{ color: "white" }} href="#">
+                    Totais da Venda
+                  </Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </div>
           </div>
         </div>
-      </section>
+      </section >
     </div>
-  );
+  )
 };
 
 export default Venda;
