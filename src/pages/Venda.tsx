@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { HTMLProps, useEffect, useRef, useState } from 'react';
 import { ContentHeader } from '@components';
 import { Nav } from 'react-bootstrap';
+import { format } from 'date-fns'
 
 const Venda = () => {
   const inputDescricaoItem = useRef<HTMLInputElement>(null);
@@ -34,6 +35,7 @@ const Venda = () => {
   const [percAntigoAcrescVenda, setPercAntigoAcrescVenda] = useState(0);
   const [indiceLinhaExclusao, setIndiceLinhaExclusao] = useState('');
   const [activeTab, setActiveTab] = useState("tab1");
+  const [dateHoje, setDateHoje] = useState('');
 
   const verificaSeTotalDescontoValorVendaTaVazio = () => {
     const vlrDescEhZero = totalDescontoValorVenda.current?.value == '0';
@@ -125,11 +127,19 @@ const Venda = () => {
     };
   }
 
-
   const handleTabSelect = (selectedTab: any) => {
     if (selectedTab) {
-      setActiveTab(selectedTab);
+      if(totalValorLiqTudo <= 0) {
+        alert('Não tem nenhum item na venda! Verifique.');
+        return;
+      } else {
+        setActiveTab(selectedTab);
+      }
     };
+  };
+
+  async function descontaValorAoExcluirItem () {
+
   };
 
   const handleBlurDescontoVenda = () => {
@@ -176,6 +186,14 @@ const Venda = () => {
       return;
     }
     const meuTableBodyVenda = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
+    const linhaSelecionada = document.getElementsByClassName('selected')[0] as HTMLTableRowElement | undefined;
+
+    if (linhaSelecionada) {
+      const valorARetirar = linhaSelecionada.cells[5].textContent;
+      const valorTotVenda = (totalValorLiquidoValor - Number(valorARetirar));
+      setTotaLValorLiquidoVendaValor(+valorTotVenda);
+      setTotalValorLiquidoVendaText(`R$ `+ valorTotVenda.toFixed(2).replace('.', ',0'));
+    }
 
     meuTableBodyVenda.deleteRow(parseInt(indiceLinhaExclusao));
 
@@ -274,6 +292,16 @@ const Venda = () => {
     return totValorComDesconto;
   };
 
+  const buscaDatadeHoje = () => {
+    const dataDeHoje = new Date();
+    const formataData = format(dataDeHoje, 'dd/MM/yyyy');
+    setDateHoje(formataData);
+  };
+
+  useEffect(() => {
+    buscaDatadeHoje();
+  }, [])
+
   return (
     <div>
       <ContentHeader title="Venda" />
@@ -283,7 +311,7 @@ const Venda = () => {
             <div className="card-header">
               <h3 className="card-title pt-2"><strong>Venda: 1</strong></h3>
               <div className='card-tools'>
-                <input className='form-control' type='date' value='2023-03-02' disabled={true} />
+                <input className='form-control' style={{textAlign: 'end', width: 120}} type='string' value={ dateHoje } disabled={true} />
               </div>
             </div>
             <div className="card-body">
