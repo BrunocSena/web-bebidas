@@ -2,7 +2,9 @@
 import React, { HTMLProps, useEffect, useRef, useState } from 'react';
 import { ContentHeader } from '@components';
 import { Nav } from 'react-bootstrap';
-import { format } from 'date-fns'
+import { format } from 'date-fns';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const Venda = () => {
   const inputDescricaoItem = useRef<HTMLInputElement>(null);
@@ -36,6 +38,18 @@ const Venda = () => {
   const [indiceLinhaExclusao, setIndiceLinhaExclusao] = useState('');
   const [activeTab, setActiveTab] = useState("tab1");
   const [dateHoje, setDateHoje] = useState('');
+  const [itensVenda, setItensVenda] = useState([{}]);
+
+  const handleAdicionaItem = () => {
+    setItensVenda([...itensVenda, {
+      descricao: inputDescricaoItem.current?.value,
+      qtdeUnitariaItem: qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0'),
+      qtdeCaixaItem: qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0'),
+      precoUnitarioItem: inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0'),
+      precoCaixaItem: inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0'),
+      valorTotalItem: totalValorLiquidoValor.toFixed(2).replace('.', ',')
+    }])
+  };
 
   const verificaSeTotalDescontoValorVendaTaVazio = () => {
     const vlrDescEhZero = totalDescontoValorVenda.current?.value == '0';
@@ -127,18 +141,18 @@ const Venda = () => {
     };
   }
 
-  const handleTabSelect = (selectedTab: any) => {
-    if (selectedTab) {
-      if(totalValorLiqTudo <= 0) {
+  const handleTabButtonClick = (tabKey: string) => {
+    if (tabKey) {
+      if (totalValorLiqTudo <= 0) {
         alert('Não tem nenhum item na venda! Verifique.');
         return;
       } else {
-        setActiveTab(selectedTab);
+        setActiveTab(tabKey);
       }
     };
   };
 
-  async function descontaValorAoExcluirItem () {
+  async function descontaValorAoExcluirItem() {
 
   };
 
@@ -146,42 +160,42 @@ const Venda = () => {
     const desconto = totalDescontoValorVenda.current?.value == '' ? 0 : parseFloat(totalDescontoValorVenda.current?.value ?? '0');
     const varConformeValorDescMuda = (totalValorLiquidoValor + valorAntigoDescVenda);
     setValorAntigoDescVenda(desconto);
-    const totComDescontoVenda = (varConformeValorDescMuda - desconto); 
+    const totComDescontoVenda = (varConformeValorDescMuda - desconto);
     setTotaLValorLiquidoVendaValor(+totComDescontoVenda);
-    setTotalValorLiquidoVendaText(`R$ `+totComDescontoVenda.toFixed(2).replace('.', ','));
+    setTotalValorLiquidoVendaText(`R$ ` + totComDescontoVenda.toFixed(2).replace('.', ','));
   }
 
   const handleBlurDescontoVendaPerc = () => {
     const percDesc = totalDescontoPercVenda.current?.value == '' ? 0 : parseFloat(totalDescontoPercVenda.current?.value ?? '0');
     const varConformePercDescMuda = (totalValorLiquidoValor + percAntigoDescVenda);
-    const totalDesconto = (varConformePercDescMuda * (percDesc/100));
+    const totalDesconto = (varConformePercDescMuda * (percDesc / 100));
     setPercAntigoDescVenda(totalDesconto);
     const totalComDescontoVendaPerc = (varConformePercDescMuda - totalDesconto);
     setTotaLValorLiquidoVendaValor(+totalComDescontoVendaPerc);
-    setTotalValorLiquidoVendaText(`R$ `+ totalComDescontoVendaPerc.toFixed(2).replace('.', ','));
+    setTotalValorLiquidoVendaText(`R$ ` + totalComDescontoVendaPerc.toFixed(2).replace('.', ','));
   }
 
   const handleBlurAcrescimoVenda = () => {
     const acrescimo = totalAcrescimoValorVenda.current?.value == '' ? 0 : parseFloat(totalAcrescimoValorVenda.current?.value ?? '0');
     const varConformeValorAcrescMuda = (totalValorLiquidoValor - valorAntigoAcrescVenda);
     setValorAntigoAcrescVenda(acrescimo);
-    const totComAcrescimoVenda = (varConformeValorAcrescMuda + acrescimo); 
+    const totComAcrescimoVenda = (varConformeValorAcrescMuda + acrescimo);
     setTotaLValorLiquidoVendaValor(+totComAcrescimoVenda);
-    setTotalValorLiquidoVendaText(`R$ `+totComAcrescimoVenda.toFixed(2).replace('.', ','));
+    setTotalValorLiquidoVendaText(`R$ ` + totComAcrescimoVenda.toFixed(2).replace('.', ','));
   }
 
   const handleBlurAcrescimoVendaPerc = () => {
     const percAcresc = totalAcrescimoPercVenda.current?.value == '' ? 0 : parseFloat(totalAcrescimoPercVenda.current?.value ?? '0');
     const varConformePercAcrescMuda = (totalValorLiquidoValor - percAntigoAcrescVenda);
-    const totalAcrescimoPerc = (varConformePercAcrescMuda * (percAcresc/100));
+    const totalAcrescimoPerc = (varConformePercAcrescMuda * (percAcresc / 100));
     setPercAntigoAcrescVenda(totalAcrescimoPerc);
     const totalComAcrescimoVendaPerc = (varConformePercAcrescMuda + totalAcrescimoPerc);
     setTotaLValorLiquidoVendaValor(+totalComAcrescimoVendaPerc);
-    setTotalValorLiquidoVendaText(`R$ `+ totalComAcrescimoVendaPerc.toFixed(2).replace('.', ','));
+    setTotalValorLiquidoVendaText(`R$ ` + totalComAcrescimoVendaPerc.toFixed(2).replace('.', ','));
   }
 
-  function excluiRowDataTable () {
-    if(indiceLinhaExclusao == '') {
+  function excluiRowDataTable() {
+    if (indiceLinhaExclusao == '') {
       alert('Nenhum item para retirar da venda!');
       return;
     }
@@ -192,7 +206,7 @@ const Venda = () => {
       const valorARetirar = linhaSelecionada.cells[5].textContent;
       const valorTotVenda = (totalValorLiquidoValor - Number(valorARetirar));
       setTotaLValorLiquidoVendaValor(+valorTotVenda);
-      setTotalValorLiquidoVendaText(`R$ `+ valorTotVenda.toFixed(2).replace('.', ',0'));
+      setTotalValorLiquidoVendaText(`R$ ` + valorTotVenda.toFixed(2).replace('.', ','));
     }
 
     meuTableBodyVenda.deleteRow(parseInt(indiceLinhaExclusao));
@@ -261,7 +275,9 @@ const Venda = () => {
     const acrescPercItem = acrescimoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(acrescimoPorcentagemDoItem.current?.value ?? '0');
     const valorTotDoItem = await calculaValorTotal(qtdeUnitariaItem, precoUnitarioDoItem, qtdeCaixaItem, precoCaixaDoItem, descontoPorcentagemItem, descontoValorItem, acrescValorItem, acrescPercItem);
     const maisItem = [descricaoDoItem, qtdeUnitariaItem, qtdeCaixaItem, precoUnitarioDoItem.toFixed(2).replace('.', ','), precoCaixaDoItem.toFixed(2).replace('.', ','), valorTotDoItem.toFixed(2).replace('.', ',')];
-    addInfoDataTable(maisItem)
+    handleAdicionaItem();
+    addInfoDataTable(maisItem);
+
   };
 
   async function calculaValorTotal(qtdeUnitaria: number,
@@ -283,11 +299,11 @@ const Venda = () => {
     await atualizaTotais(totAcrescimo, totDesconto, totSemDesconto, totValorComDesconto, qtdeUnitaria, qtdeCaixas);
     const totTodosItensValorBruto = (totValorComDesconto + totalValorBrutoValor);
     const totTodosItensValorLiquido = (totValorComDesconto + totalValorLiquidoValor);
-    
+
     setTotaLValorLiquidoVendaValor(totTodosItensValorLiquido);
     setTotalValorBrutoVendaValor(totTodosItensValorBruto);
-    setTotalValorBrutoVendaText(`R$ `+totTodosItensValorBruto.toFixed(2).replace('.', ','));
-    setTotalValorLiquidoVendaText(`R$ `+totTodosItensValorLiquido.toFixed(2).replace('.', ','));
+    setTotalValorBrutoVendaText(`R$ ` + totTodosItensValorBruto.toFixed(2).replace('.', ','));
+    setTotalValorLiquidoVendaText(`R$ ` + totTodosItensValorLiquido.toFixed(2).replace('.', ','));
 
     return totValorComDesconto;
   };
@@ -311,7 +327,7 @@ const Venda = () => {
             <div className="card-header">
               <h3 className="card-title pt-2"><strong>Venda: 1</strong></h3>
               <div className='card-tools'>
-                <input className='form-control' style={{textAlign: 'end', width: 120}} type='string' value={ dateHoje } disabled={true} />
+                <input className='form-control' style={{ textAlign: 'end', width: 120 }} type='string' value={dateHoje} disabled={true} />
               </div>
             </div>
             <div className="card-body">
@@ -403,9 +419,9 @@ const Venda = () => {
                           id="btnAdicionaItem">
                           Adicionar Item
                         </button>
-                        <button className="btn btn-danger btn-lg pb-1" 
-                        onClick={async () => { excluiRowDataTable() }}
-                        id="btnExcluiItem">Excluir Item</button>
+                        <button className="btn btn-danger btn-lg pb-1"
+                          onClick={async () => { excluiRowDataTable() }}
+                          id="btnExcluiItem">Excluir Item</button>
                       </div>
                     </div>
                   </div>
@@ -429,8 +445,7 @@ const Venda = () => {
                 <div>
                   <div className="form-group row col-sm-12">
                     <div className="row col-sm-12">
-                      <label className='col-sm-3'>
-                      </label>
+
                       <label htmlFor='txtTotalQtdeUnitariaVendataria' className='col-sm-3'>
                         Total da Qtde Unitária:
                       </label>
@@ -439,13 +454,15 @@ const Venda = () => {
                       </label>
                       <label className='col-sm-3'>
                       </label>
-                      <div className='col-sm-3'>
-                      </div>
+                      <label className='col-sm-3'>
+                      </label>
                       <div className='col-sm-3'>
                         <input className='form-control' disabled={true} value={totalQtdeUnitTudo} id="txtTotalQtdeUnitariaVenda" type="number" />
                       </div>
                       <div className='col-sm-3'>
                         <input className='form-control' disabled={true} value={totalQtdeCaixasTudo} id="txtTotalQtdeCaixaVenda" type="number" />
+                      </div>
+                      <div className='col-sm-3'>
                       </div>
                       <div className='col-sm-3'>
                       </div>
@@ -481,8 +498,6 @@ const Venda = () => {
                   </div>
                   <div className="form-group row col-sm-12">
                     <div className="row col-sm-12">
-                      <label className='col-sm-3'>
-                      </label>
                       <label htmlFor='txtTotalVendaBruto' className='col-sm-3'>
                         Total da Venda Bruto:
                       </label>
@@ -491,8 +506,8 @@ const Venda = () => {
                       </label>
                       <label className='col-sm-3'>
                       </label>
-                      <div className='col-sm-3'>
-                      </div>
+                      <label className='col-sm-3'>
+                      </label>
                       <div className='col-sm-3'>
                         <input className='form-control' disabled={true} value={totalValorBrutoVenda} id="txtTotalVendaBruto" type="string" />
                       </div>
@@ -501,20 +516,20 @@ const Venda = () => {
                       </div>
                       <div className='col-sm-3'>
                       </div>
+                      <div className='col-sm-3'>
+                      </div>
                     </div>
                   </div>
                   <div className="form-group row col-sm-12">
                     <div className="row col-sm-12">
-                      <div className="col-sm-3">
-                      </div>
-                      <div className='col-sm-6 ml-4'>
+                      <div className='col-sm-6'>
                         <button
                           className="btn btn-info btn-lg pb-1 mr-2"
-                          onClick={async () => { adicionaItem() }}
+                          onClick={async () => {  }}
                           id="btnFechaVenda">
                           Fechar Venda
                         </button>
-                        <button className="btn btn-danger btn-lg pb-1" id="btnCancelaVenda">Cancelar Venda</button>
+                        <button className="btn btn-danger btn-lg pb-1 ml-4" id="btnCancelaVenda">Cancelar Venda</button>
                       </div>
                     </div>
                   </div>
@@ -522,23 +537,25 @@ const Venda = () => {
               )}
             </div>
             <div className="card-footer">
-              <Nav variant="tabs" activeKey={activeTab} onSelect={handleTabSelect}>
-                <Nav.Item>
-                  <Nav.Link eventKey="tab1" style={{ color: "white" }} href="#">
-                    Itens da Venda
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="tab2" style={{ color: "white" }} href="#">
-                    Totais da Venda
-                  </Nav.Link>
-                </Nav.Item>
-              </Nav>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <button
+                  onClick={() => handleTabButtonClick('tab1')}
+                  className="btn btn-secondary btn-sm"
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "2em", justifyContent: 'flex-start' }} />
+                </button>
+                <button
+                  onClick={() => handleTabButtonClick('tab2')}
+                  className="btn btn-secondary btn-sm ml-2"
+                >
+                  <FontAwesomeIcon icon={faArrowRight} style={{ fontSize: "2em", justifyContent: 'flex-end' }} />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </div >
       </section >
-    </div>
+    </div >
   )
 };
 
