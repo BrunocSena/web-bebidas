@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { HTMLProps, useEffect, useRef, useState } from 'react';
 import { ContentHeader } from '@components';
-import { Nav } from 'react-bootstrap';
 import { format } from 'date-fns';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -38,18 +37,86 @@ const Venda = () => {
   const [indiceLinhaExclusao, setIndiceLinhaExclusao] = useState('');
   const [activeTab, setActiveTab] = useState("tab1");
   const [dateHoje, setDateHoje] = useState('');
-  const [itensVenda, setItensVenda] = useState([{}]);
+  const [itensVenda, setItensVenda] = useState<ItemProps[]>([]);
+  const [idItem, setIdItem] = useState(0);
 
-  const handleAdicionaItem = () => {
+  interface ItemProps {
+    id: number;
+    descricao?: string;
+    qtdeUnitariaItem: number;
+    qtdeCaixaItem: number;
+    precoUnitarioItem: number;
+    precoCaixaItem: number;
+    valorTotalItem?: string;
+  }
+
+  const handleAdicionaItem = (valorItemTotal: number) => {
+    let idItemVenda = idItem + 1;
+    setIdItem(idItemVenda);
     setItensVenda([...itensVenda, {
+      id: idItemVenda,
       descricao: inputDescricaoItem.current?.value,
       qtdeUnitariaItem: qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0'),
       qtdeCaixaItem: qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0'),
       precoUnitarioItem: inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0'),
       precoCaixaItem: inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0'),
-      valorTotalItem: totalValorLiquidoValor.toFixed(2).replace('.', ',')
-    }])
+      valorTotalItem: valorItemTotal.toFixed(2).replace('.', ',')
+    }]);
   };
+
+  const voltaATab1 = () => {
+
+    const tabelaToda = document.getElementById('tabelaItensVenda') as HTMLTableElement;
+    const tabelaTBody = tabelaToda.children[1] as HTMLTableSectionElement;
+
+    const rows = itensVenda.map((itemVenda) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+      <td>${itemVenda.descricao}</td>
+      <td>${itemVenda.qtdeUnitariaItem}</td>
+      <td>${itemVenda.qtdeCaixaItem}</td>
+      <td>${itemVenda.precoUnitarioItem}</td>
+      <td>${itemVenda.precoCaixaItem}</td>
+      <td>${itemVenda.valorTotalItem}</td>
+    `;
+
+      tr.addEventListener('click', (event) => {
+        const linhaSelecionada = event.currentTarget as HTMLTableRowElement;
+        const indiceLinhaSelecionada = linhaSelecionada.rowIndex;
+        const linhaQueJaEstavaSelecionada = document.querySelector('.selected');
+
+        if (linhaQueJaEstavaSelecionada) {
+          linhaQueJaEstavaSelecionada.classList.remove('selected');
+        };
+
+        linhaSelecionada.classList.add('selected');
+        linhaSelecionada.style.backgroundColor = 'blue';
+        setIndiceLinhaExclusao(String(indiceLinhaSelecionada));
+      });
+      const fragment = document.createDocumentFragment();
+      fragment.appendChild(tr);
+      return fragment;
+    });
+
+    const fragment = document.createDocumentFragment();
+    rows.forEach(row => {
+      fragment.appendChild(row);
+    });
+
+    tabelaTBody.innerHTML = '';
+    tabelaTBody.appendChild(fragment);
+
+    const inputBarra = document.getElementById('txtBarraProduto') as HTMLInputElement;
+    inputBarra.focus();
+  }
+
+  useEffect(() => {
+    if (activeTab == 'tab1') {
+      if (itensVenda != null) {
+        voltaATab1()
+      }
+    }
+  }, [activeTab]);
 
   const verificaSeTotalDescontoValorVendaTaVazio = () => {
     const vlrDescEhZero = totalDescontoValorVenda.current?.value == '0';
@@ -204,9 +271,11 @@ const Venda = () => {
 
     if (linhaSelecionada) {
       const valorARetirar = linhaSelecionada.cells[5].textContent;
-      const valorTotVenda = (totalValorLiquidoValor - Number(valorARetirar));
+      const valorTotVenda = (totalValorLiquidoValor - parseFloat(valorARetirar == null ? '0': valorARetirar));
       setTotaLValorLiquidoVendaValor(+valorTotVenda);
       setTotalValorLiquidoVendaText(`R$ ` + valorTotVenda.toFixed(2).replace('.', ','));
+      setTotalValorBrutoVendaValor(+valorTotVenda);
+      setTotalValorBrutoVendaText(`R$ ` + valorTotVenda.toFixed(2).replace('.', ','));
     }
 
     meuTableBodyVenda.deleteRow(parseInt(indiceLinhaExclusao));
@@ -242,6 +311,32 @@ const Venda = () => {
     myTableItensVenda.appendChild(myTableItensVendaBody)
   };
 
+  function limpaCampos() {
+
+    const inputBarraProduto = document.getElementById('txtBarraProduto') as HTMLInputElement;
+    const inputDescricao = document.getElementById('txtDescricaoProduto') as HTMLInputElement;
+    const inputQtdeUnitaria = document.getElementById('txtQtdeUnitaria') as HTMLInputElement;
+    const inputQtdeCaixa = document.getElementById('txtQtdeCaixas') as HTMLInputElement;
+    const inputPrecoUnitario = document.getElementById('txtPrecoUnitario') as HTMLInputElement;
+    const inputPrecoCaixa = document.getElementById('txtPrecoCaixas') as HTMLInputElement;
+    const inputDescontoValor = document.getElementById('txtDescontoValor') as HTMLInputElement;
+    const inputDescontoPerc = document.getElementById('txtDescontoPorcentagem') as HTMLInputElement;
+    const inputAcrescimoValor = document.getElementById('txtAcrescimoValor') as HTMLInputElement;
+    const inputAcrescimoPerc = document.getElementById('txtAcrescimoPorcentagem') as HTMLInputElement;
+
+    // inputBarraProduto.value = '';
+    inputDescricao.value = '';
+    inputQtdeUnitaria.value = '';
+    inputQtdeCaixa.value = '';
+    // inputPrecoUnitario.value = '';
+    // inputPrecoCaixa.value = '';
+    inputDescontoValor.value = '';
+    inputDescontoPerc.value = '';
+    inputAcrescimoValor.value = '';
+    inputAcrescimoPerc.value = '';
+
+  }
+
   async function atualizaTotais(totalAcresc: number, totalDesconto: number, totalValorBruto: number, totalValorLiq: number, totalQtdeUnit: number, totalQtdeCaixas: number) {
     const totListaItensAcresc = (totalAcresc + totalAcrescimo);
     const totListaItensDesc = (totalDesconto + totalDescontoTudo);
@@ -275,9 +370,9 @@ const Venda = () => {
     const acrescPercItem = acrescimoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(acrescimoPorcentagemDoItem.current?.value ?? '0');
     const valorTotDoItem = await calculaValorTotal(qtdeUnitariaItem, precoUnitarioDoItem, qtdeCaixaItem, precoCaixaDoItem, descontoPorcentagemItem, descontoValorItem, acrescValorItem, acrescPercItem);
     const maisItem = [descricaoDoItem, qtdeUnitariaItem, qtdeCaixaItem, precoUnitarioDoItem.toFixed(2).replace('.', ','), precoCaixaDoItem.toFixed(2).replace('.', ','), valorTotDoItem.toFixed(2).replace('.', ',')];
-    handleAdicionaItem();
+    handleAdicionaItem(valorTotDoItem);
     addInfoDataTable(maisItem);
-
+    limpaCampos();
   };
 
   async function calculaValorTotal(qtdeUnitaria: number,
@@ -314,8 +409,14 @@ const Venda = () => {
     setDateHoje(formataData);
   };
 
+  function cancelaVenda() {
+    location.reload();
+  };
+
   useEffect(() => {
     buscaDatadeHoje();
+    const inputBarra = document.getElementById('txtBarraProduto') as HTMLInputElement;
+    inputBarra.focus();
   }, [])
 
   return (
@@ -525,11 +626,11 @@ const Venda = () => {
                       <div className='col-sm-6'>
                         <button
                           className="btn btn-info btn-lg pb-1 mr-2"
-                          onClick={async () => {  }}
+                          onClick={async () => { }}
                           id="btnFechaVenda">
                           Fechar Venda
                         </button>
-                        <button className="btn btn-danger btn-lg pb-1 ml-4" id="btnCancelaVenda">Cancelar Venda</button>
+                        <button className="btn btn-danger btn-lg pb-1 ml-4" onClick={cancelaVenda} id="btnCancelaVenda">Cancelar Venda</button>
                       </div>
                     </div>
                   </div>
@@ -539,7 +640,9 @@ const Venda = () => {
             <div className="card-footer">
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <button
-                  onClick={() => handleTabButtonClick('tab1')}
+                  onClick={() => {
+                    handleTabButtonClick('tab1');
+                  }}
                   className="btn btn-secondary btn-sm"
                 >
                   <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "2em", justifyContent: 'flex-start' }} />
