@@ -419,12 +419,11 @@ const Venda = () => {
 
   useEffect(() => {
     buscaDatadeHoje();
-    const inputBarra = document.getElementById('txtBarraProduto') as HTMLInputElement;
-    inputBarra.focus();
-  }, [])
+    inputBarraProduto.current?.focus();
+  }, []);
 
   return (
-    <div>
+    <div id="minhaPagina">
       <ContentHeader title="Venda" />
       <section className="content">
         <div className="container-fluid">
