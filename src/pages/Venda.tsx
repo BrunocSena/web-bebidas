@@ -41,7 +41,6 @@ const Venda = () => {
   const [idItem, setIdItem] = useState(0);
 
   interface ItemProps {
-    id: number;
     descricao?: string;
     qtdeUnitariaItem: number;
     qtdeCaixaItem: number;
@@ -54,7 +53,6 @@ const Venda = () => {
     let idItemVenda = idItem + 1;
     setIdItem(idItemVenda);
     setItensVenda([...itensVenda, {
-      id: idItemVenda,
       descricao: inputDescricaoItem.current?.value,
       qtdeUnitariaItem: qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0'),
       qtdeCaixaItem: qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0'),
@@ -219,10 +217,6 @@ const Venda = () => {
     };
   };
 
-  async function descontaValorAoExcluirItem() {
-
-  };
-
   const handleBlurDescontoVenda = () => {
     const desconto = totalDescontoValorVenda.current?.value == '' ? 0 : parseFloat(totalDescontoValorVenda.current?.value ?? '0');
     const varConformeValorDescMuda = (totalValorLiquidoValor + valorAntigoDescVenda);
@@ -270,7 +264,17 @@ const Venda = () => {
     const linhaSelecionada = document.getElementsByClassName('selected')[0] as HTMLTableRowElement | undefined;
 
     if (linhaSelecionada) {
+      const produtoAretirar = linhaSelecionada.cells[0].textContent;
+      const qtdeUnitariaRetirar = linhaSelecionada.cells[1].textContent;
+      const qtdeCaixaRetirar = linhaSelecionada.cells[2].textContent;
+      const precoUnitRetirar = linhaSelecionada.cells[3].textContent;
+      const precoCaixasRetirar = linhaSelecionada.cells[4].textContent;
       const valorARetirar = linhaSelecionada.cells[5].textContent;
+
+      const encontraIndice = itensVenda.findIndex((item) => item.descricao == produtoAretirar && String(item.qtdeUnitariaItem) == qtdeUnitariaRetirar && String(item.qtdeCaixaItem) == qtdeCaixaRetirar && String(item.precoCaixaItem) == precoCaixasRetirar && String(item.precoUnitarioItem) == precoUnitRetirar && item.valorTotalItem == valorARetirar);
+      itensVenda.splice(encontraIndice, 1);
+      setItensVenda(itensVenda);
+
       const valorTotVenda = (totalValorLiquidoValor - parseFloat(valorARetirar == null ? '0': valorARetirar));
       setTotaLValorLiquidoVendaValor(+valorTotVenda);
       setTotalValorLiquidoVendaText(`R$ ` + valorTotVenda.toFixed(2).replace('.', ','));
