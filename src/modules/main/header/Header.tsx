@@ -3,10 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleControlSidebar, toggleDarkMode, toggleSidebarMenu } from '@app/store/reducers/ui';
-import MessagesDropdown from '@app/modules/main/header/messages-dropdown/MessagesDropdown';
-import NotificationsDropdown from '@app/modules/main/header/notifications-dropdown/NotificationsDropdown';
-import LanguagesDropdown from '@app/modules/main/header/languages-dropdown/LanguagesDropdown';
-import UserDropdown from '@app/modules/main/header/user-dropdown/UserDropdown';
 import { logoutUser } from '@app/store/reducers/auth';
 
 const Header = () => {
@@ -28,9 +24,6 @@ const Header = () => {
     dispatch(toggleSidebarMenu());
   };
 
-  const handleToggleControlSidebar = () => {
-    dispatch(toggleControlSidebar());
-  };
 
   const [estaDark, setEstaDark] = useState(false);
 
@@ -41,9 +34,6 @@ const Header = () => {
     }
   }, []);
 
-  const handleDarkModeChange = () => {
-    dispatch(toggleDarkMode());
-  };
 
   const getContainerClasses = useCallback(() => {
     let classes = `main-header navbar navbar-expand ${navbarVariant}`;

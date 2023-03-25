@@ -22,17 +22,18 @@ const Login = () => {
   const [t] = useTranslation();
 
   const login = async (login: string, password: string) => {
-    try {
+    const fezLogin = await AuthService.loginByAuth(login, password);
+    
+    if(fezLogin) {
       setAuthLoading(true);
-      const token = await AuthService.loginByAuth(login, password);
       toast.success('Login feito com sucesso!');
       setAuthLoading(false);
-      dispatch(loginUser(token));
+      dispatch(loginUser(true));
       navigate('/');
       handleDarkModeChange();
-    } catch (error: any) {
+    } else {
       setAuthLoading(false);
-      toast.error(error.message || 'Failed');
+      toast.error('Login ou senha incorretos! Verifique');
     }
   };
 
