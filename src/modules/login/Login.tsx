@@ -1,16 +1,16 @@
-import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {Link, useNavigate} from 'react-router-dom';
-import {toast} from 'react-toastify';
-import {useFormik} from 'formik';
-import {useTranslation} from 'react-i18next';
-import {loginUser} from '@store/reducers/auth';
-import {setWindowClass} from '@app/utils/helpers';
-import {PfButton, PfCheckbox} from '@profabric/react-components';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useFormik } from 'formik';
+import { useTranslation } from 'react-i18next';
+import { loginUser } from '@store/reducers/auth';
+import { setWindowClass } from '@app/utils/helpers';
+import { PfButton, PfCheckbox } from '@profabric/react-components';
 
 import * as Yup from 'yup';
 
-import {Form, InputGroup} from 'react-bootstrap';
+import { Form, InputGroup } from 'react-bootstrap';
 import * as AuthService from '../../services/auth';
 import { toggleDarkMode } from '@app/store/reducers/ui';
 
@@ -21,10 +21,10 @@ const Login = () => {
   const navigate = useNavigate();
   const [t] = useTranslation();
 
-  const login = async (email: string, password: string) => {
+  const login = async (login: string, password: string) => {
     try {
       setAuthLoading(true);
-      const token = await AuthService.loginByAuth(email, password);
+      const token = await AuthService.loginByAuth(login, password);
       toast.success('Login feito com sucesso!');
       setAuthLoading(false);
       dispatch(loginUser(token));
@@ -40,20 +40,20 @@ const Login = () => {
     dispatch(toggleDarkMode());
   };
 
-  const {handleChange, values, handleSubmit, touched, errors} = useFormik({
+  const { handleChange, values, handleSubmit, touched, errors } = useFormik({
     initialValues: {
-      email: '',
+      login: '',
       password: ''
     },
     validationSchema: Yup.object({
-      email: Yup.string().email('Invalid email address').required('Required'),
+      login: Yup.string().required('Required'),
       password: Yup.string()
         .min(5, 'Must be 5 characters or more')
         .max(30, 'Must be 30 characters or less')
         .required('Required')
     }),
     onSubmit: (values) => {
-      login(values.email, values.password);
+      login(values.login, values.password);
     }
   });
 
@@ -64,36 +64,27 @@ const Login = () => {
       <div className="card card-outline card-primary">
         <div className="card-header text-center">
           <Link to="/" className="h1">
-            <b>Admin</b>
-            <span>LTE</span>
+            <b>Place Beer</b>
           </Link>
         </div>
         <div className="card-body">
-          <p className="login-box-msg">{t<string>('login.label.signIn')}</p>
+          <p className="login-box-msg">Entre com seu usuário e senha</p>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <InputGroup className="mb-3">
                 <Form.Control
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Email"
+                  id="login"
+                  name="login"
+                  type="text"
+                  placeholder="Usuário"
                   onChange={handleChange}
-                  value={values.email}
-                  isValid={touched.email && !errors.email}
-                  isInvalid={touched.email && !!errors.email}
+                  value={values.login}
                 />
-                {touched.email && errors.email ? (
-                  <Form.Control.Feedback type="invalid">
-                    {errors.email}
-                  </Form.Control.Feedback>
-                ) : (
-                  <InputGroup.Append>
-                    <InputGroup.Text>
-                      <i className="fas fa-envelope" />
-                    </InputGroup.Text>
-                  </InputGroup.Append>
-                )}
+                <InputGroup.Append>
+                  <InputGroup.Text>
+                    <i className="fas fa-envelope" />
+                  </InputGroup.Text>
+                </InputGroup.Append>
               </InputGroup>
             </div>
             <div className="mb-3">
@@ -125,7 +116,7 @@ const Login = () => {
             <div className="row">
               <div className="col-8">
                 <PfCheckbox checked={false}>
-                  {t<string>('login.label.rememberMe')}
+                  Lembrar usuário e senha
                 </PfCheckbox>
               </div>
               <div className="col-4">
@@ -134,21 +125,11 @@ const Login = () => {
                   type="submit"
                   loading={isAuthLoading}
                 >
-                  {t<string>('login.button.signIn.label')}
+                  Log In
                 </PfButton>
               </div>
             </div>
           </form>
-          <p className="mb-1">
-            <Link to="/forgot-password">
-              {t<string>('login.label.forgotPass')}
-            </Link>
-          </p>
-          <p className="mb-0">
-            <Link to="/register" className="text-center">
-              {t<string>('login.label.registerNew')}
-            </Link>
-          </p>
         </div>
       </div>
     </div>

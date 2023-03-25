@@ -3,7 +3,6 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import {ToastContainer} from 'react-toastify';
 import Main from '@modules/main/Main';
 import Login from '@modules/login/Login';
-import Register from '@modules/register/Register';
 import ForgetPassword from '@modules/forgot-password/ForgotPassword';
 import RecoverPassword from '@modules/recover-password/RecoverPassword';
 import {useWindowSize} from '@app/hooks/useWindowSize';
@@ -43,9 +42,6 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<PublicRoute />}>
           <Route path="/login" element={<Login />} />
-        </Route>
-        <Route path="/register" element={<PublicRoute />}>
-          <Route path="/register" element={<Register />} />
         </Route>
         <Route path="/forgot-password" element={<PublicRoute />}>
           <Route path="/forgot-password" element={<ForgetPassword />} />

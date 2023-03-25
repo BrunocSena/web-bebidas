@@ -1,10 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ContentHeader } from '@components';
+import { api } from '@app/lib/axios';
 
 const CadProduto = () => {
 
   const [estaIncluindo, setEstaIncluindo] = useState(false);
   const [estaAlterando, setEstaAlterando] = useState(false);
+  const refDescricaoProduto = useRef<HTMLInputElement>(null);
+  const refQtdeUnitarioProduto = useRef<HTMLInputElement>(null);
+  const refQtdeCaixaProduto = useRef<HTMLInputElement>(null);
+  const refPrecoUnitarioItem = useRef<HTMLInputElement>(null);
+  const refPrecoCaixaItem = useRef<HTMLInputElement>(null);
+  const refCustoUnitarioItem = useRef<HTMLInputElement>(null);
+  const refCustoCaixaItem = useRef<HTMLInputElement>(null);
+  const refBarraUnitariaItem = useRef<HTMLInputElement>(null);
+  const refBarraCaixaItem = useRef<HTMLInputElement>(null);
+
+
+  async function criaProduto() {
+    try {
+      const response = await api.post('/cadastroproduto', {
+        codigoProduto: '',
+        descricaoProduto: refDescricaoProduto,
+        qtdeUnitariaItem: refQtdeUnitarioProduto.current?.value == '' ? 0 : parseFloat(refQtdeUnitarioProduto.current?.value ?? '0'),
+        qtdeCaixaItem: refQtdeCaixaProduto.current?.value == '' ? 0 : parseFloat(refQtdeCaixaProduto.current?.value ?? '0'),
+        precoUnitarioItem: refPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(refPrecoUnitarioItem.current?.value ?? '0'),
+        precoCaixaItem: refPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(refPrecoCaixaItem.current?.value ?? '0'),
+        custoUnitarioItem: refCustoUnitarioItem.current?.value == '' ? 0 : parseFloat(refCustoUnitarioItem.current?.value ?? '0'),
+        custoCaixaItem: refCustoCaixaItem.current?.value == '' ? 0 : parseFloat(refCustoCaixaItem.current?.value ?? '0'),
+        barraUnitariaItem: refBarraUnitariaItem.current?.value == '' ? '' : refBarraUnitariaItem.current?.value,
+        barraCaixaItem: refBarraCaixaItem.current?.value == '' ? '' : refBarraCaixaItem.current?.value,
+      });
+
+      alert('Produto criado com sucesso!');
+    } catch (error) {
+      console.log(error)
+      alert('Falha ao cadastrar o produto!');
+      return;
+    }
+    
+  }
 
   useEffect (() => {
 
@@ -26,7 +61,7 @@ const CadProduto = () => {
       btnExcluir?.classList.add('d-none');
       btnCancelar?.classList.remove('d-none');
     }
-  }, [estaAlterando, estaIncluindo])
+  }, [estaAlterando, estaIncluindo]);
 
   return (
     <div>
@@ -63,6 +98,7 @@ const CadProduto = () => {
                     <input
                       type="text"
                       className="form-control"
+                      ref={refDescricaoProduto}
                       id="inputsProduto"
                       placeholder="Descrição"
                       disabled={!estaIncluindo && !estaAlterando}
@@ -89,6 +125,7 @@ const CadProduto = () => {
                       type="number"
                       className="form-control"
                       id="inputQtdeUnitaria"
+                      ref={refQtdeUnitarioProduto}
                       placeholder="Quantidade Unit."
                       disabled={true}
                     />
@@ -98,6 +135,7 @@ const CadProduto = () => {
                       type="number"
                       className="form-control"
                       id="inputQtdeCaixa"
+                      ref={refQtdeCaixaProduto}
                       placeholder="Quantidade Caixa"
                       disabled={true}
                     />
@@ -107,6 +145,7 @@ const CadProduto = () => {
                       type="text"
                       className="form-control"
                       id="inputPrecoUnit"
+                      ref={refPrecoUnitarioItem}
                       placeholder="Preço Unitário"
                       disabled={!estaIncluindo && !estaAlterando}
                     />
@@ -115,6 +154,7 @@ const CadProduto = () => {
                     <input
                       type="text"
                       className="form-control"
+                      ref={refPrecoCaixaItem}
                       id="inputPrecoCaixa"
                       placeholder="Preço Caixa"
                       disabled={!estaIncluindo && !estaAlterando}
@@ -135,6 +175,7 @@ const CadProduto = () => {
                       type="text"
                       className="form-control"
                       id="inputCustoUnitario"
+                      ref={refCustoUnitarioItem}
                       placeholder="Custo Unit."
                       disabled={!estaIncluindo && !estaAlterando}
                     />
@@ -143,6 +184,7 @@ const CadProduto = () => {
                     <input
                       type="text"
                       className="form-control"
+                      ref={refCustoCaixaItem}
                       id="inputCustoCaixa"
                       placeholder="Custo em Caixa"
                       disabled={!estaIncluindo && !estaAlterando}
@@ -150,16 +192,32 @@ const CadProduto = () => {
                   </div>
                 </div>
               </div>
-              <label htmlFor="inputBarraCadProduto" className="col-sm-12">
-                Barra:
+              <label htmlFor="inputBarraUnitariaProduto" className="col-sm-6">
+                Barra Unitária:
+              </label>
+              <label htmlFor="inputBarraCaixaProduto" className="col-sm-6">
+                Barra Caixa:
               </label>
               <div className="row col-sm-12">
                 <div className="col-sm-6">
                   <input
                     type="text"
                     className="form-control"
-                    id="inputBarraCadProduto"
-                    placeholder="Barra"
+                    id="inputBarraUnitariaProduto"
+                    ref={refBarraUnitariaItem}
+                    placeholder="Barra Unitária"
+                    disabled={!estaIncluindo && !estaAlterando}
+                  />
+                </div>
+              </div>
+              <div className="row col-sm-12">
+                <div className="col-sm-6">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="inputBarraCaixaProduto"
+                    ref={refBarraCaixaItem}
+                    placeholder="Barra Caixa"
                     disabled={!estaIncluindo && !estaAlterando}
                   />
                 </div>
@@ -171,6 +229,7 @@ const CadProduto = () => {
                 id="btnIncluirCadProduto"
                 onClick={() => {
                   setEstaIncluindo(true)
+                  criaProduto();
                 }}
               >
                 Incluir
