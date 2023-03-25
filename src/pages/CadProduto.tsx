@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ContentHeader } from '@components';
 import { api } from '@app/lib/axios';
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import '../../node_modules/react-toastify/dist/ReactToastify.min.css'
 
 const CadProduto = () => {
 
   const [estaIncluindo, setEstaIncluindo] = useState(false);
   const [estaAlterando, setEstaAlterando] = useState(false);
+  const refInputCodigoProduto = useRef<HTMLInputElement>(null);
   const refDescricaoProduto = useRef<HTMLInputElement>(null);
   const refQtdeUnitarioProduto = useRef<HTMLInputElement>(null);
   const refQtdeCaixaProduto = useRef<HTMLInputElement>(null);
@@ -15,38 +19,79 @@ const CadProduto = () => {
   const refCustoCaixaItem = useRef<HTMLInputElement>(null);
   const refBarraUnitariaItem = useRef<HTMLInputElement>(null);
   const refBarraCaixaItem = useRef<HTMLInputElement>(null);
+  const refBarraPesquisa = useRef<HTMLInputElement>(null);
 
 
   async function criaProduto() {
     try {
-      const response = await api.post('/cadastroproduto', {
-        codigoProduto: '',
-        descricaoProduto: refDescricaoProduto,
-        qtdeUnitariaItem: refQtdeUnitarioProduto.current?.value == '' ? 0 : parseFloat(refQtdeUnitarioProduto.current?.value ?? '0'),
-        qtdeCaixaItem: refQtdeCaixaProduto.current?.value == '' ? 0 : parseFloat(refQtdeCaixaProduto.current?.value ?? '0'),
-        precoUnitarioItem: refPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(refPrecoUnitarioItem.current?.value ?? '0'),
-        precoCaixaItem: refPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(refPrecoCaixaItem.current?.value ?? '0'),
-        custoUnitarioItem: refCustoUnitarioItem.current?.value == '' ? 0 : parseFloat(refCustoUnitarioItem.current?.value ?? '0'),
-        custoCaixaItem: refCustoCaixaItem.current?.value == '' ? 0 : parseFloat(refCustoCaixaItem.current?.value ?? '0'),
-        barraUnitariaItem: refBarraUnitariaItem.current?.value == '' ? '' : refBarraUnitariaItem.current?.value,
-        barraCaixaItem: refBarraCaixaItem.current?.value == '' ? '' : refBarraCaixaItem.current?.value,
-      });
-
-      alert('Produto criado com sucesso!');
+      const produtoACriarJson = {
+        "descricaoProd": refDescricaoProduto.current?.value,
+        "qtdeUnitariaItem": refQtdeUnitarioProduto.current?.value == '' ? 0 : parseFloat(refQtdeUnitarioProduto.current?.value ?? '0'),
+        "qtdeCaixaItem": refQtdeCaixaProduto.current?.value == '' ? 0 : parseFloat(refQtdeCaixaProduto.current?.value ?? '0'),
+        "precoUnitarioItem": refPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(refPrecoUnitarioItem.current?.value ?? '0'),
+        "precoCaixaItem": refPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(refPrecoCaixaItem.current?.value ?? '0'),
+        "custoUnitarioItem": refCustoUnitarioItem.current?.value == '' ? 0 : parseFloat(refCustoUnitarioItem.current?.value ?? '0'),
+        "custoCaixaItem": refCustoCaixaItem.current?.value == '' ? 0 : parseFloat(refCustoCaixaItem.current?.value ?? '0'),
+        "barraUnitariaItem": refBarraUnitariaItem.current?.value == '' ? '' : refBarraUnitariaItem.current?.value,
+        "barraCaixaItem": refBarraCaixaItem.current?.value == '' ? '' : refBarraCaixaItem.current?.value,
+        "usaQtdeEmCaixa": true
+      }
+      const response = await api.post('cadastroproduto/novoproduto', produtoACriarJson);
+      toast.success('Produto criado com sucesso!');
+      const inputCodigoProduto = document.getElementById('inputCodigo') as HTMLInputElement;
+      inputCodigoProduto.value = response.data.codigoProdCreated;
     } catch (error) {
-      console.log(error)
-      alert('Falha ao cadastrar o produto!');
-      return;
+      console.error(error);
+      toast.error('Erro ao criar o produto! Verifique');
     }
-    
   }
 
-  useEffect (() => {
+  async function consultaProduto() {
+    try {
+      const consultaPorBarra = {
+        "barraConsultada": refBarraPesquisa.current?.value
+      }
 
-    const btnIncluir =  document.getElementById('btnIncluirCadProduto');
+      const response = await api.post('cadastroproduto/consultaproduto', consultaPorBarra);
+      const txtCodigoProduto = document.getElementById('inputCodigo') as HTMLInputElement;
+      const txtDescricaoProd = document.getElementById('inputsProduto') as HTMLInputElement;
+      const txtQtdeUnitaria = document.getElementById('inputQtdeUnitaria') as HTMLInputElement;
+      const txtQtdeCaixa = document.getElementById('inputQtdeCaixa') as HTMLInputElement;
+      const txtCustoUnitario = document.getElementById('inputCustoUnitario') as HTMLInputElement;
+      const txtCustoCaixa = document.getElementById('inputCustoCaixa') as HTMLInputElement;
+      const txtBarraUnitaria = document.getElementById('inputBarraUnitariaProduto') as HTMLInputElement;
+      const txtBarraCaixa = document.getElementById('inputBarraCaixaProduto') as HTMLInputElement;
+      const txtPesquisa = document.getElementById('inputPesquisaProduto') as HTMLInputElement;
+      const txtPrecoUnitario = document.getElementById('inputPrecoUnit') as HTMLInputElement;
+      const txtPrecoCaixa = document.getElementById('inputPrecoCaixa') as HTMLInputElement;
+
+      const produtoEncontrado = response.data[0];
+
+      txtCodigoProduto.value = produtoEncontrado.codigoProduto;
+      txtDescricaoProd.value = produtoEncontrado.descricaoProduto;
+      txtQtdeUnitaria.value = produtoEncontrado.qtdeUnitaria;
+      txtQtdeCaixa.value = produtoEncontrado.qtdeCaixa;
+      txtCustoUnitario.value = produtoEncontrado.custoUnitProduto;
+      txtCustoCaixa.value = produtoEncontrado.custoCaixaProduto;
+      txtBarraUnitaria.value = produtoEncontrado.barraUnitariaProduto;
+      txtBarraCaixa.value = produtoEncontrado.barraCaixaProduto;
+      txtPrecoUnitario.value = produtoEncontrado.precoUnitProduto;
+      txtPrecoCaixa.value = produtoEncontrado.precoCaixaProduto;
+      txtPesquisa.value = '';
+
+    } catch (error: any) {
+      console.error(error);
+      toast.error('Erro ao consulta barra, por favor verifique!');
+    }
+  }
+
+  useEffect(() => {
+
+    const btnIncluir = document.getElementById('btnIncluirCadProduto');
     const btnCancelar = document.getElementById('btnCancelarCadProduto');
     const btnAlterar = document.getElementById('btnAlterarCadProduto');
     const btnExcluir = document.getElementById('btnExcluirCadProduto');
+    const btnConfirmar = document.getElementById('btnConfirmaCadProduto');
 
     if (!estaAlterando && !estaIncluindo) {
 
@@ -54,12 +99,14 @@ const CadProduto = () => {
       btnAlterar?.classList.remove('d-none');
       btnExcluir?.classList.remove('d-none');
       btnCancelar?.classList.add('d-none');
+      btnConfirmar?.classList.add('d-none');
 
     } else {
       btnIncluir?.classList.add('d-none');
       btnAlterar?.classList.add('d-none');
       btnExcluir?.classList.add('d-none');
       btnCancelar?.classList.remove('d-none');
+      btnConfirmar?.classList.remove('d-none');
     }
   }, [estaAlterando, estaIncluindo]);
 
@@ -70,8 +117,23 @@ const CadProduto = () => {
         <div className="container-fluid">
           <div className='row' style={{ marginLeft: 1 }}>
             <div className='input-group'>
+              <label htmlFor="inputsProduto" className="col-sm-12">
+                Pesquisa Produto:
+              </label>
               <input
-                className="form-control col-sm-2 mb-1">
+                id='inputPesquisaProduto'
+                className="form-control col-sm-2 mb-1"
+                ref={refBarraPesquisa}
+                onKeyDown={async (event) => {
+                  if (event.key === 'Enter') {
+                    const inputElementPesquisa = event.target as HTMLInputElement;
+                    inputElementPesquisa.blur();
+                  }
+                }}
+                onBlur={async () => {
+                  consultaProduto();
+                }}
+              >
               </input>
               <i className="fa fa-search ml-2 pt-2" />
             </div>
@@ -127,7 +189,7 @@ const CadProduto = () => {
                       id="inputQtdeUnitaria"
                       ref={refQtdeUnitarioProduto}
                       placeholder="Quantidade Unit."
-                      disabled={true}
+                      disabled={!estaIncluindo && !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -137,7 +199,7 @@ const CadProduto = () => {
                       id="inputQtdeCaixa"
                       ref={refQtdeCaixaProduto}
                       placeholder="Quantidade Caixa"
-                      disabled={true}
+                      disabled={!estaIncluindo && !estaAlterando}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -209,8 +271,6 @@ const CadProduto = () => {
                     disabled={!estaIncluindo && !estaAlterando}
                   />
                 </div>
-              </div>
-              <div className="row col-sm-12">
                 <div className="col-sm-6">
                   <input
                     type="text"
@@ -229,7 +289,6 @@ const CadProduto = () => {
                 id="btnIncluirCadProduto"
                 onClick={() => {
                   setEstaIncluindo(true)
-                  criaProduto();
                 }}
               >
                 Incluir
@@ -242,6 +301,17 @@ const CadProduto = () => {
                 }}
               >
                 Alterar
+              </button>
+              <button
+                className="btn btn-warning mr-1 d-none"
+                id="btnConfirmaCadProduto"
+                onClick={async () => {
+                  setEstaAlterando(false);
+                  setEstaIncluindo(false);
+                  await criaProduto();
+                }}
+              >
+                Confirmar
               </button>
               <button
                 className="btn btn-danger mr-1 d-none"
