@@ -28,12 +28,12 @@ const Main = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await Gatekeeper.getProfile();
-      dispatch(loadUser(response));
+      // const response = await Gatekeeper.getProfile();
+      // dispatch(loadUser(response));
       await sleep(1000);
       setIsAppLoaded(true);
     } catch (error) {
-      dispatch(logoutUser());
+      // dispatch(logoutUser());
       await sleep(1000);
       setIsAppLoaded(true);
     }
