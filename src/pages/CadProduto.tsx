@@ -23,6 +23,8 @@ const CadProduto = () => {
 
 
   async function criaProduto() {
+    const cbUsaCaixa = document.getElementById('cbUsaCaixa') as HTMLInputElement;
+    
     try {
       const produtoACriarJson = {
         "descricaoProd": refDescricaoProduto.current?.value,
@@ -34,7 +36,7 @@ const CadProduto = () => {
         "custoCaixaItem": refCustoCaixaItem.current?.value == '' ? 0 : parseFloat(refCustoCaixaItem.current?.value ?? '0'),
         "barraUnitariaItem": refBarraUnitariaItem.current?.value == '' ? '' : refBarraUnitariaItem.current?.value,
         "barraCaixaItem": refBarraCaixaItem.current?.value == '' ? '' : refBarraCaixaItem.current?.value,
-        "usaQtdeEmCaixa": true
+        "usaQtdeEmCaixa": cbUsaCaixa.checked
       }
       const response = await api.post('cadastroproduto/novoproduto', produtoACriarJson);
       toast.success('Produto criado com sucesso!');
@@ -44,6 +46,35 @@ const CadProduto = () => {
       console.error(error);
       toast.error('Erro ao criar o produto! Verifique');
     }
+  };
+
+  function limpaCampos () {
+      const txtCodigoProduto = document.getElementById('inputCodigo') as HTMLInputElement;
+      const txtDescricaoProd = document.getElementById('inputsProduto') as HTMLInputElement;
+      const txtQtdeUnitaria = document.getElementById('inputQtdeUnitaria') as HTMLInputElement;
+      const txtQtdeCaixa = document.getElementById('inputQtdeCaixa') as HTMLInputElement;
+      const txtCustoUnitario = document.getElementById('inputCustoUnitario') as HTMLInputElement;
+      const txtCustoCaixa = document.getElementById('inputCustoCaixa') as HTMLInputElement;
+      const txtBarraUnitaria = document.getElementById('inputBarraUnitariaProduto') as HTMLInputElement;
+      const txtBarraCaixa = document.getElementById('inputBarraCaixaProduto') as HTMLInputElement;
+      const txtPesquisa = document.getElementById('inputPesquisaProduto') as HTMLInputElement;
+      const txtPrecoUnitario = document.getElementById('inputPrecoUnit') as HTMLInputElement;
+      const txtPrecoCaixa = document.getElementById('inputPrecoCaixa') as HTMLInputElement;
+      const cbUsaCaixaProduto = document.getElementById('cbUsaCaixa') as HTMLInputElement;
+
+
+      txtCodigoProduto.value = '';
+      txtDescricaoProd.value = '';
+      txtQtdeUnitaria.value = '';
+      txtQtdeCaixa.value = '';
+      txtCustoUnitario.value = '';
+      txtCustoCaixa.value = '';
+      txtBarraUnitaria.value = '';
+      txtBarraCaixa.value = '';
+      txtPrecoUnitario.value = '';
+      txtPrecoCaixa.value = '';
+      cbUsaCaixaProduto.checked = false;
+      txtPesquisa.value = '';
   }
 
   async function consultaProduto() {
@@ -64,6 +95,7 @@ const CadProduto = () => {
       const txtPesquisa = document.getElementById('inputPesquisaProduto') as HTMLInputElement;
       const txtPrecoUnitario = document.getElementById('inputPrecoUnit') as HTMLInputElement;
       const txtPrecoCaixa = document.getElementById('inputPrecoCaixa') as HTMLInputElement;
+      const cbUsaCaixaProduto = document.getElementById('cbUsaCaixa') as HTMLInputElement;
 
       const produtoEncontrado = response.data[0];
 
@@ -77,6 +109,7 @@ const CadProduto = () => {
       txtBarraCaixa.value = produtoEncontrado.barraCaixaProduto;
       txtPrecoUnitario.value = produtoEncontrado.precoUnitProduto;
       txtPrecoCaixa.value = produtoEncontrado.precoCaixaProduto;
+      cbUsaCaixaProduto.checked = produtoEncontrado.usaQtdeCaixa == '1' ? true : false;
       txtPesquisa.value = '';
 
     } catch (error: any) {
@@ -142,9 +175,16 @@ const CadProduto = () => {
             <div className="card-body">
               <div className="form-group row col-sm-12">
                 <div className="row col-sm-12">
-                  <label htmlFor="inputsProduto" className="col-sm-12">
-                    Produto:
-                  </label>
+                  <div className='col-sm-10'>
+                    <label htmlFor="inputsProduto" className="col-sm-12">
+                      Produto:
+                    </label>
+                  </div>
+                  <div className='col-sm-2'>
+                    <label style={{textAlign: 'center'}}htmlFor="cbUsaCaixa" className="col-sm-12">
+                      Tem Qtde em Caixa?
+                    </label>
+                  </div>
                 </div>
                 <div className="row col-sm-12">
                   <div className="col-sm-3">
@@ -156,13 +196,21 @@ const CadProduto = () => {
                       disabled={true}
                     />
                   </div>
-                  <div className="col-sm-9">
+                  <div className="col-sm-7">
                     <input
                       type="text"
                       className="form-control"
                       ref={refDescricaoProduto}
                       id="inputsProduto"
                       placeholder="Descrição"
+                      disabled={!estaIncluindo && !estaAlterando}
+                    />
+                  </div>
+                  <div className="col-sm-2">
+                    <input
+                      type="checkbox"
+                      className="form-control"
+                      id="cbUsaCaixa"
                       disabled={!estaIncluindo && !estaAlterando}
                     />
                   </div>
@@ -288,7 +336,8 @@ const CadProduto = () => {
                 className="btn btn-warning mr-1"
                 id="btnIncluirCadProduto"
                 onClick={() => {
-                  setEstaIncluindo(true)
+                  setEstaIncluindo(true);
+                  limpaCampos();
                 }}
               >
                 Incluir
