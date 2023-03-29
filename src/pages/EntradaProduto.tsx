@@ -1,14 +1,18 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState } from 'react';
-import {ContentHeader} from '@components';
+import React, { useEffect, useRef, useState } from 'react';
+import { ContentHeader } from '@components';
+import { api } from '@app/lib/axios';
+import { toast } from 'react-toastify';
+import { format } from 'date-fns';
 
 const EntradaProduto = () => {
- 
+  const inputBarraPesquisa = useRef<HTMLInputElement>(null);
   const [estaEditando, setEstaEditando] = useState(false);
+  const [dateHoje, setDateHoje] = useState('');
 
-  useEffect (() => {
+  useEffect(() => {
 
-    const btnModoEdicaoEntProduto =  document.getElementById('btnModoEdicaoEntProduto');
+    const btnModoEdicaoEntProduto = document.getElementById('btnModoEdicaoEntProduto');
     const btnCancelarModoEdicaoProduto = document.getElementById('btnCancelarModoEdicaoProduto');
 
     if (!estaEditando) {
@@ -22,7 +26,100 @@ const EntradaProduto = () => {
       btnCancelarModoEdicaoProduto?.classList.remove('d-none');
 
     }
-  }, [estaEditando])
+  }, [estaEditando]);
+
+  function limpaCampos() {
+    const txtBarraEntrada = document.getElementById('inputBarraEntradaProduto') as HTMLInputElement;
+    const txtCodigoEntrada = document.getElementById('inputCodigoEntradaProduto') as HTMLInputElement;
+    const txtDescricaoEntrada = document.getElementById('inputsProdutoEntradaProduto') as HTMLInputElement;
+    const txtQtdeUnitEntrada = document.getElementById('inputQtdeUnitariaEntradaProduto') as HTMLInputElement;
+    const txtQtdeCaixaEntrada = document.getElementById('inputQtdeCaixaEntradaProduto') as HTMLInputElement;
+    const txtCustoUnitEntrada = document.getElementById('inputCustoUnitarioEntradaProduto') as HTMLInputElement;
+    const txtCustoCaixaEntrada = document.getElementById('inputCustoCaixaEntradaProduto') as HTMLInputElement;
+    const txtPrecoUnitarioEntrada = document.getElementById('inputPrecoUnitarioEntradaProduto') as HTMLInputElement;
+    const txtPrecoCaixaEntrada = document.getElementById('inputPrecoCaixaEntradaProduto') as HTMLInputElement;
+
+
+    txtBarraEntrada.value = '';
+    txtCodigoEntrada.value = '';
+    txtDescricaoEntrada.value = '';
+    txtQtdeUnitEntrada.value = '';
+    txtQtdeCaixaEntrada.value = '';
+    txtCustoUnitEntrada.value = '';
+    txtCustoCaixaEntrada.value = '';
+    txtPrecoUnitarioEntrada.value = '';
+    txtPrecoCaixaEntrada.value = '';
+  };
+
+   async function consultaProduto () {
+
+    if(inputBarraPesquisa.current?.value == '' || inputBarraPesquisa.current?.value == undefined) {
+      limpaCampos();
+      return;
+    };
+
+    const txtBarraEntrada = document.getElementById('inputBarraEntradaProduto') as HTMLInputElement;
+    const txtCodigoEntrada = document.getElementById('inputCodigoEntradaProduto') as HTMLInputElement;
+    const txtDescricaoEntrada = document.getElementById('inputsProdutoEntradaProduto') as HTMLInputElement;
+    const txtQtdeUnitEntrada = document.getElementById('inputQtdeUnitariaEntradaProduto') as HTMLInputElement;
+    const txtQtdeCaixaEntrada = document.getElementById('inputQtdeCaixaEntradaProduto') as HTMLInputElement;
+    const txtCustoUnitEntrada = document.getElementById('inputCustoUnitarioEntradaProduto') as HTMLInputElement;
+    const txtCustoCaixaEntrada = document.getElementById('inputCustoCaixaEntradaProduto') as HTMLInputElement;
+    const txtPrecoUnitarioEntrada = document.getElementById('inputPrecoUnitarioEntradaProduto') as HTMLInputElement;
+    const txtPrecoCaixaEntrada = document.getElementById('inputPrecoCaixaEntradaProduto') as HTMLInputElement;
+
+    try {
+      const barraPesquisa = inputBarraPesquisa.current?.value == '' ? '' : inputBarraPesquisa.current?.value;
+      const objBarraPesquisa = {
+        "codigoBarras": barraPesquisa
+      }
+      const response = await api.post('entradaestoque/novaentrada', objBarraPesquisa);
+      const produtoEntrada = response.data[0];
+      if (produtoEntrada.barraCaixaProduto == barraPesquisa) {
+        txtCodigoEntrada.value = produtoEntrada.codigoProduto;
+        txtDescricaoEntrada.value = produtoEntrada.descricaoProduto;
+        txtQtdeUnitEntrada.value = produtoEntrada.qtdeUnitaria;
+        txtQtdeCaixaEntrada.value = produtoEntrada.qtdeCaixa;
+        txtCustoUnitEntrada.value = produtoEntrada.custoUnitProduto;
+        txtCustoCaixaEntrada.value = produtoEntrada.custoCaixaProduto;
+        txtPrecoUnitarioEntrada.value = produtoEntrada.precoUnitProduto;
+        txtPrecoCaixaEntrada.value = produtoEntrada.precoCaixaProduto;
+      } else {
+        txtCodigoEntrada.value = produtoEntrada.codigoProduto;
+        txtDescricaoEntrada.value = produtoEntrada.descricaoProduto;
+        txtQtdeUnitEntrada.value = produtoEntrada.qtdeUnitaria;
+        txtQtdeCaixaEntrada.value = produtoEntrada.qtdeCaixa;
+        txtCustoUnitEntrada.value = produtoEntrada.custoUnitProduto;
+        txtCustoCaixaEntrada.value = produtoEntrada.custoCaixaProduto;
+        txtPrecoUnitarioEntrada.value = produtoEntrada.precoUnitProduto;
+        txtPrecoCaixaEntrada.value = produtoEntrada.precoCaixaProduto;
+      }
+      // txtBarraEntrada.value = '';
+      // txtCodigoEntrada.value = '';
+      // txtDescricaoEntrada.value = '';
+      // txtQtdeUnitEntrada.value = '';
+      // txtQtdeCaixaEntrada.value = '';
+      // txtCustoUnitEntrada.value = '';
+      // txtCustoCaixaEntrada.value = '';
+      // txtPrecoUnitarioEntrada.value = '';
+      // txtPrecoCaixaEntrada.value = '';
+    } catch (error) {
+      console.error(error);
+      toast.error('Produto não encontrado ou não cadastrado para dar entrada! Favor verificar.');
+      limpaCampos();
+    }
+  };
+
+  const buscaDatadeHoje = () => {
+    const dataDeHoje = new Date();
+    const formataData = format(dataDeHoje, 'dd/MM/yyyy');
+    setDateHoje(formataData);
+  };
+
+
+  useEffect(() => {
+    buscaDatadeHoje();
+  }, []);
 
   return (
     <div>
@@ -32,7 +129,40 @@ const EntradaProduto = () => {
           <div className='row' style={{ marginLeft: 1 }}>
           </div>
           <div className="card">
+            <div className="card-header">
+              <div className='card-tools'>
+                <input className='form-control' style={{ textAlign: 'end', width: 120 }} type='string' value={dateHoje} disabled={true} />
+              </div>
+            </div>
             <div className="card-body">
+              <div className="form-group row col-sm-12">
+                <div className='row col-sm-12'>
+                  <label htmlFor="inputBarraEntradaProduto" className="col-sm-3">
+                    Barra:
+                  </label>
+                </div>
+                <div className='row col-sm-12'>
+                  <div className="col-sm-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      ref={inputBarraPesquisa}
+                      id="inputBarraEntradaProduto"
+                      onKeyDown={async (event) => {
+                        if (event.key === 'Enter') {
+                          const inputElementPesquisa = event.target as HTMLInputElement;
+                          inputElementPesquisa.blur();
+                        }
+                      }}
+                      onBlur={async () => {
+                        consultaProduto();
+                      }}
+                      placeholder="Barra"
+                      disabled={!estaEditando}
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="form-group row col-sm-12">
                 <div className="row col-sm-12">
                   <label htmlFor="inputCodigoEntradaProduto" className="col-sm-12">
@@ -112,23 +242,36 @@ const EntradaProduto = () => {
                   </div>
                 </div>
               </div>
-              <label htmlFor="inputBarraEntradaProduto" className="col-sm-6">
-                Barra:
+
+              <label htmlFor="inputPrecoUnitarioEntradaProduto" className="col-sm-4">
+                Preço Unitário:
               </label>
-              <label htmlFor="inputTipoEntrada" className="col-sm-6">
+              <label htmlFor="inputPrecoCaixaEntradaProduto" className="col-sm-4">
+                Preço em Caixa:
+              </label>
+              <label htmlFor="inputTipoEntrada" className="col-sm-4">
                 Tipo Entrada:
               </label>
               <div className="row col-sm-12">
-                <div className="col-sm-6">
+                <div className="col-sm-4">
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
-                    id="inputBarraEntradaProduto"
-                    placeholder="Barra"
+                    id="inputPrecoUnitarioEntradaProduto"
+                    placeholder="Preço Unit."
                     disabled={!estaEditando}
                   />
                 </div>
-                <div className="col-sm-6">
+                <div className="col-sm-4">
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="inputPrecoCaixaEntradaProduto"
+                    placeholder="Preço Caixa"
+                    disabled={!estaEditando}
+                  />
+                </div>
+                <div className="col-sm-4">
                   <input
                     type="text"
                     className="form-control"
@@ -155,6 +298,7 @@ const EntradaProduto = () => {
                 id="btnCancelarModoEdicaoProduto"
                 onClick={() => {
                   setEstaEditando(false);
+                  limpaCampos();
                 }}
               >
                 Cancelar

@@ -108,7 +108,7 @@ const CadProduto = () => {
           "custoCaixaItem": custoCaixaItem,
           "barraUnitariaItem": barraUnitariaItem,
           "barraCaixaItem": barraCaixaItem,
-          "usaQtdeEmCaixa": usaQtdeEmCaixa,
+          "usaQtdeEmCaixa": true,
         }
         const response = await api.post('cadastroproduto/alteraproduto', produtoAlterado);
         toast.success('Produto alterado com sucesso!');
@@ -117,10 +117,51 @@ const CadProduto = () => {
       } catch (error) {
         console.error(error);
         toast.error('Erro ao alterar o produto! Verifique');
+        limpaCampos();
       }
-    };
-  }
+    } else {
 
+      if (qtdeUnitariaItem == 0) {
+        toast.error('Não foi informada a quantidade unitária! Favor informar.');
+        return;
+      };
+      if (precoUnitarioItem == 0) {
+        toast.error('Não foi informado o preço unitário do produto! Favor informar.');
+        return;
+      };
+      if (custoUnitarioItem == 0) {
+        toast.error('Não foi informado o custo unitário do produto! Favor informar.');
+        return;
+      };
+      if (barraUnitariaItem == '') {
+        toast.error('Não foi informado o código de barras unitário! Favor informar.')
+      };
+
+      try {
+        const produtoAlterado = {
+          "codigoDoProduto": codigoProduto,
+          "descricaoProd": descricaoProd,
+          "qtdeUnitariaItem": qtdeUnitariaItem,
+          "qtdeCaixaItem": 0,
+          "precoUnitarioItem": precoUnitarioItem,
+          "precoCaixaItem": 0,
+          "custoUnitarioItem": custoUnitarioItem,
+          "custoCaixaItem": 0,
+          "barraUnitariaItem": barraUnitariaItem,
+          "barraCaixaItem": '0',
+          "usaQtdeEmCaixa": false,
+        }
+        const response = await api.post('cadastroproduto/alteraproduto', produtoAlterado);
+        toast.success('Produto alterado com sucesso!');
+        const inputCodigoProduto = document.getElementById('inputCodigo') as HTMLInputElement;
+        inputCodigoProduto.value = response.data.codigoDoProduto;
+      } catch (error) {
+        console.error(error);
+        toast.error('Erro ao alterar o produto! Verifique');
+        limpaCampos();
+      };
+    };
+  };
 
   async function criaProduto() {
     const cbUsaCaixa = document.getElementById('cbUsaCaixa') as HTMLInputElement;
@@ -138,38 +179,77 @@ const CadProduto = () => {
     if (descricaoProd == '') {
       toast.error('Descrição do produto não informada! Favor informar');
       return;
-    }
+    };
 
     if (usaQtdeEmCaixa) {
       if (qtdeCaixaItem == 0) {
         toast.error('Não foi informada a quantidade em caixas! Favor informar.');
         return;
-      }
+      };
       if (precoCaixaItem == 0) {
         toast.error('Não foi informado o preço da caixa do produto! Favor informar.');
         return;
-      }
+      };
       if (custoCaixaItem == 0) {
         toast.error('Não foi informado o custo da caixa do produto! Favor informar.');
         return;
-      }
+      };
       if (barraCaixaItem == '') {
         toast.error('Não foi informado o código de barras de caixa! Favor informar.')
-      }
-    }
+      };
+
+      try {
+        const produtoACriarJson = {
+          "descricaoProd": descricaoProd,
+          "qtdeUnitariaItem": qtdeUnitariaItem,
+          "qtdeCaixaItem": qtdeCaixaItem,
+          "precoUnitarioItem": precoUnitarioItem,
+          "precoCaixaItem": precoCaixaItem,
+          "custoUnitarioItem": custoUnitarioItem,
+          "custoCaixaItem": custoCaixaItem,
+          "barraUnitariaItem": barraUnitariaItem,
+          "barraCaixaItem": barraCaixaItem,
+          "usaQtdeEmCaixa": true,
+        }
+        const response = await api.post('cadastroproduto/novoproduto', produtoACriarJson);
+        toast.success('Produto criado com sucesso!');
+        const inputCodigoProduto = document.getElementById('inputCodigo') as HTMLInputElement;
+        inputCodigoProduto.value = response.data.codigoProdCreated;
+      } catch (error: any) {
+        console.error(error);
+        toast.error(error.response.data.message);
+        limpaCampos();
+      };
+    } else {
+      if (qtdeUnitariaItem == 0) {
+        toast.error('Não foi informada a quantidade unitária! Favor informar.');
+        return;
+      };
+      if (precoUnitarioItem == 0) {
+        toast.error('Não foi informado o preço unitário do produto! Favor informar.');
+        return;
+      };
+      if (custoUnitarioItem == 0) {
+        toast.error('Não foi informado o custo unitário do produto! Favor informar.');
+        return;
+      };
+      if (barraUnitariaItem == '') {
+        toast.error('Não foi informado o código de barras unitário! Favor informar.')
+      };
+    };
 
     try {
       const produtoACriarJson = {
         "descricaoProd": descricaoProd,
         "qtdeUnitariaItem": qtdeUnitariaItem,
-        "qtdeCaixaItem": qtdeCaixaItem,
+        "qtdeCaixaItem": 0,
         "precoUnitarioItem": precoUnitarioItem,
-        "precoCaixaItem": precoCaixaItem,
+        "precoCaixaItem": 0,
         "custoUnitarioItem": custoUnitarioItem,
-        "custoCaixaItem": custoCaixaItem,
+        "custoCaixaItem": 0,
         "barraUnitariaItem": barraUnitariaItem,
-        "barraCaixaItem": barraCaixaItem,
-        "usaQtdeEmCaixa": usaQtdeEmCaixa,
+        "barraCaixaItem": '0',
+        "usaQtdeEmCaixa": false,
       }
       const response = await api.post('cadastroproduto/novoproduto', produtoACriarJson);
       toast.success('Produto criado com sucesso!');
@@ -178,6 +258,30 @@ const CadProduto = () => {
     } catch (error: any) {
       console.error(error);
       toast.error(error.response.data.message);
+      limpaCampos();
+    };
+  };
+
+  async function excluirProduto () {
+    if (estaAlterando || estaIncluindo) {
+      toast.error('Favor, sair da inclusão/alteração para remover um produto!');
+    }
+    try {
+      const senhaUsuario = window.prompt('Tem certeza que deseja excluir o produto? Digite sua senha:');
+      if (senhaUsuario == 'admin') {
+        const codigoProduto = refInputCodigoProduto.current?.value;
+        const produtoAExcluir = {
+          "codigoProd": codigoProduto
+        }
+        const response = await api.post('cadastroproduto/excluirproduto', produtoAExcluir);
+        toast.success('Produto excluído com sucesso!');
+        limpaCampos();
+      } else {
+        toast.error('Senha incorreta! Tente novamente.')
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao excluir produto! Por favor, verifique!')
     }
   };
 
@@ -213,6 +317,11 @@ const CadProduto = () => {
   }
 
   async function consultaProduto() {
+
+    if(refBarraPesquisa.current?.value == '') {
+      return;
+    };
+    
     try {
       const consultaPorBarra = {
         "barraConsultada": refBarraPesquisa.current?.value
@@ -249,7 +358,7 @@ const CadProduto = () => {
 
     } catch (error: any) {
       console.error(error);
-      toast.error('Erro ao consulta barra, por favor verifique!');
+      toast.error('Código de barras não encontrado ou não existente! Por favor, verifique.');
     }
   }
 
@@ -390,7 +499,7 @@ const CadProduto = () => {
                   </div>
                   <div className="col-sm-3 inputUnitario">
                     <input
-                      type="text"
+                      type="number"
                       className="form-control"
                       id="inputPrecoUnit"
                       ref={refPrecoUnitarioItem}
@@ -400,7 +509,7 @@ const CadProduto = () => {
                   </div>
                   <div className="col-sm-3 inputCaixa">
                     <input
-                      type="text"
+                      type="number"
                       className="form-control"
                       ref={refPrecoCaixaItem}
                       id="inputPrecoCaixa"
@@ -426,7 +535,7 @@ const CadProduto = () => {
                   </label>
                   <div className="col-sm-3 inputUnitario">
                     <input
-                      type="text"
+                      type="number"
                       className="form-control"
                       id="inputCustoUnitario"
                       ref={refCustoUnitarioItem}
@@ -436,7 +545,7 @@ const CadProduto = () => {
                   </div>
                   <div className="col-sm-3 inputCaixa">
                     <input
-                      type="text"
+                      type="number"
                       className="form-control"
                       ref={refCustoCaixaItem}
                       id="inputCustoCaixa"
@@ -510,13 +619,16 @@ const CadProduto = () => {
                 onClick={() => {
                   setEstaAlterando(false);
                   setEstaIncluindo(false);
+                  limpaCampos();
                 }}
               >
                 Cancelar
               </button>
               <button
                 id="btnExcluirCadProduto"
-                className="btn btn-dark mr-1">
+                className="btn btn-dark mr-1"
+                onClick={excluirProduto}
+                >
                 Excluir
               </button>
             </div>
