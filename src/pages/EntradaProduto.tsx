@@ -4,29 +4,97 @@ import { ContentHeader } from '@components';
 import { api } from '@app/lib/axios';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 const EntradaProduto = () => {
   const inputBarraPesquisa = useRef<HTMLInputElement>(null);
   const [estaEditando, setEstaEditando] = useState(false);
   const [dateHoje, setDateHoje] = useState('');
+  const [linhasTabela, setLinhasTabela] = useState<TableRowProps[]>([]);
+
+  interface TableRowProps {
+    codigoProduto: string;
+    descricaoProduto: string;
+    precoUnitProduto: number;
+    precoCaixaProduto: number;
+    custoUnitProduto: number;
+    custoCaixaProduto: number;
+    qtdeUnitaria: number;
+    qtdeCaixa: number;
+    barraCodigo: string;
+    onRemove: () => void;
+  };
+
+  const TableRow = ({
+    codigoProduto,
+    descricaoProduto,
+    precoUnitProduto,
+    precoCaixaProduto,
+    custoUnitProduto,
+    custoCaixaProduto,
+    qtdeUnitaria,
+    qtdeCaixa,
+    barraCodigo,
+    onRemove
+  }: TableRowProps) => {
+    return (
+      <tr>
+        <td>{codigoProduto}</td>
+        <td>{descricaoProduto}</td>
+        <td>{qtdeUnitaria}</td>
+        <td>{qtdeCaixa}</td>
+        <td>{custoUnitProduto}</td>
+        <td>{custoCaixaProduto}</td>
+        <td>{precoUnitProduto}</td>
+        <td>{precoCaixaProduto}</td>
+        <td>{barraCodigo}</td>
+        <td style={{ textAlign: 'center' }}>
+          <button onClick={onRemove}>
+            <FontAwesomeIcon icon={faTrash} />
+          </button>
+        </td>
+      </tr>
+    );
+  };
 
   useEffect(() => {
 
     const btnModoEdicaoEntProduto = document.getElementById('btnModoEdicaoEntProduto');
     const btnCancelarModoEdicaoProduto = document.getElementById('btnCancelarModoEdicaoProduto');
+    const btnConfirmaEntradaProduto = document.getElementById('btnConfirmaEntradaProduto');
 
     if (!estaEditando) {
 
       btnModoEdicaoEntProduto?.classList.remove('d-none');
       btnCancelarModoEdicaoProduto?.classList.add('d-none');
+      btnConfirmaEntradaProduto?.classList.add('d-none');
 
     } else {
 
       btnModoEdicaoEntProduto?.classList.add('d-none');
       btnCancelarModoEdicaoProduto?.classList.remove('d-none');
+      btnConfirmaEntradaProduto?.classList.remove('d-none');
 
     }
   }, [estaEditando]);
+
+  const adicionaItem = async (produtoAdiciona: TableRowProps) => {
+    const novaLinha: TableRowProps = {
+      codigoProduto: produtoAdiciona.codigoProduto,
+      descricaoProduto: produtoAdiciona.descricaoProduto,
+      precoUnitProduto: produtoAdiciona.precoUnitProduto,
+      precoCaixaProduto: produtoAdiciona.precoCaixaProduto,
+      custoUnitProduto: produtoAdiciona.custoUnitProduto,
+      custoCaixaProduto: produtoAdiciona.custoCaixaProduto,
+      qtdeUnitaria: produtoAdiciona.qtdeUnitaria,
+      qtdeCaixa: produtoAdiciona.qtdeCaixa,
+      barraCodigo: produtoAdiciona.barraCodigo,
+      onRemove: () => {}
+    };
+
+    setLinhasTabela([...linhasTabela, novaLinha]);
+  };
 
   function limpaCampos() {
     const txtBarraEntrada = document.getElementById('inputBarraEntradaProduto') as HTMLInputElement;
@@ -51,9 +119,9 @@ const EntradaProduto = () => {
     txtPrecoCaixaEntrada.value = '';
   };
 
-   async function consultaProduto () {
+  async function consultaProduto() {
 
-    if(inputBarraPesquisa.current?.value == '' || inputBarraPesquisa.current?.value == undefined) {
+    if (inputBarraPesquisa.current?.value == '' || inputBarraPesquisa.current?.value == undefined) {
       limpaCampos();
       return;
     };
@@ -75,6 +143,7 @@ const EntradaProduto = () => {
       }
       const response = await api.post('entradaestoque/novaentrada', objBarraPesquisa);
       const produtoEntrada = response.data[0];
+
       if (produtoEntrada.barraCaixaProduto == barraPesquisa) {
         txtCodigoEntrada.value = produtoEntrada.codigoProduto;
         txtDescricaoEntrada.value = produtoEntrada.descricaoProduto;
@@ -93,16 +162,22 @@ const EntradaProduto = () => {
         txtCustoCaixaEntrada.value = produtoEntrada.custoCaixaProduto;
         txtPrecoUnitarioEntrada.value = produtoEntrada.precoUnitProduto;
         txtPrecoCaixaEntrada.value = produtoEntrada.precoCaixaProduto;
-      }
-      // txtBarraEntrada.value = '';
-      // txtCodigoEntrada.value = '';
-      // txtDescricaoEntrada.value = '';
-      // txtQtdeUnitEntrada.value = '';
-      // txtQtdeCaixaEntrada.value = '';
-      // txtCustoUnitEntrada.value = '';
-      // txtCustoCaixaEntrada.value = '';
-      // txtPrecoUnitarioEntrada.value = '';
-      // txtPrecoCaixaEntrada.value = '';
+      };
+
+      let produtoFormatado: TableRowProps = {
+        codigoProduto: produtoEntrada.codigoProduto,
+        descricaoProduto: produtoEntrada.descricaoProduto,
+        qtdeUnitaria: produtoEntrada.qtdeUnitaria,
+        qtdeCaixa: produtoEntrada.qtdeCaixa,
+        custoUnitProduto: produtoEntrada.custoUnitProduto,
+        custoCaixaProduto: produtoEntrada.custoCaixaProduto,
+        precoUnitProduto: produtoEntrada.precoUnitProduto,
+        precoCaixaProduto: produtoEntrada.precoCaixaProduto,
+        barraCodigo: barraPesquisa,
+        onRemove: () => {}
+      };
+
+      adicionaItem(produtoFormatado);
     } catch (error) {
       console.error(error);
       toast.error('Produto não encontrado ou não cadastrado para dar entrada! Favor verificar.');
@@ -115,7 +190,6 @@ const EntradaProduto = () => {
     const formataData = format(dataDeHoje, 'dd/MM/yyyy');
     setDateHoje(formataData);
   };
-
 
   useEffect(() => {
     buscaDatadeHoje();
@@ -282,27 +356,73 @@ const EntradaProduto = () => {
                   />
                 </div>
               </div>
+              <div className='row col-sm-12 mt-2' style={{ marginLeft: 1 }}>
+                <button
+                  className="btn btn-info"
+                  id="btnModoEdicaoEntProduto"
+                  onClick={() => {
+                    setEstaEditando(true)
+                  }}
+                >
+
+                  Modo Edição
+                </button>
+                <button
+                  className="btn btn-info mr-1 d-none"
+                  id="btnConfirmaEntradaProduto"
+                  onClick={() => {
+                    setEstaEditando(false)
+                  }}
+                >
+
+                  Confirma
+                </button>
+                <button
+                  className="btn btn-danger d-none"
+                  id="btnCancelarModoEdicaoProduto"
+                  onClick={() => {
+                    setEstaEditando(false);
+                    limpaCampos();
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+              <div className='row col-sm-12 mt-2'>
+                <table id="tabelaEntradaEstoque" className="table table-sm table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44', marginLeft: 9 }}>
+                  <thead>
+                    <th>Prod.</th>
+                    <th>Descrição</th>
+                    <th>Qtd. Unit.</th>
+                    <th>Qtd. Caixas</th>
+                    <th>Custo Unit.</th>
+                    <th>Custo Caixas</th>
+                    <th>Preço Unit.</th>
+                    <th>Preço Caixas</th>
+                    <th>Cód. Barras</th>
+                    <th style={{ textAlign: 'center' }}>Ações</th>
+                  </thead>
+                  <tbody id="tabelaTBody">
+                    {linhasTabela.map((linha: TableRowProps) => (
+                      <TableRow
+                        codigoProduto={linha.codigoProduto}
+                        descricaoProduto={linha.descricaoProduto}
+                        precoUnitProduto={linha.precoUnitProduto}
+                        precoCaixaProduto={linha.precoCaixaProduto}
+                        custoUnitProduto={linha.custoUnitProduto}
+                        custoCaixaProduto={linha.custoCaixaProduto}
+                        qtdeUnitaria={linha.qtdeUnitaria}
+                        qtdeCaixa={linha.qtdeCaixa}
+                        barraCodigo={linha.barraCodigo}
+                        onRemove={() => { }}
+                      />
+                    ))}
+                  </tbody>
+
+                </table>
+              </div>
             </div>
             <div className="card-footer">
-              <button
-                className="btn btn-info"
-                id="btnModoEdicaoEntProduto"
-                onClick={() => {
-                  setEstaEditando(true)
-                }}
-              >
-                Modo Edição
-              </button>
-              <button
-                className="btn btn-danger d-none"
-                id="btnCancelarModoEdicaoProduto"
-                onClick={() => {
-                  setEstaEditando(false);
-                  limpaCampos();
-                }}
-              >
-                Cancelar
-              </button>
             </div>
           </div>
         </div>
