@@ -273,7 +273,7 @@ const CadProduto = () => {
         const produtoAExcluir = {
           "codigoProd": codigoProduto
         }
-        const response = await api.post('cadastroproduto/excluirproduto', produtoAExcluir);
+        await api.post('cadastroproduto/excluirproduto', produtoAExcluir);
         toast.success('Produto excluído com sucesso!');
         limpaCampos();
       } else {

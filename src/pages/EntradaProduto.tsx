@@ -5,7 +5,7 @@ import { api } from '@app/lib/axios';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const EntradaProduto = () => {
   const inputBarraPesquisa = useRef<HTMLInputElement>(null);
@@ -23,7 +23,7 @@ const EntradaProduto = () => {
     qtdeUnitaria: number;
     qtdeCaixa: number;
     barraCodigo: string;
-    onRemove: () => void;
+    onRemove: (event: any) => void;
   };
 
   const TableRow = ({
@@ -59,23 +59,17 @@ const EntradaProduto = () => {
   };
 
   useEffect(() => {
-
     const btnModoEdicaoEntProduto = document.getElementById('btnModoEdicaoEntProduto');
     const btnCancelarModoEdicaoProduto = document.getElementById('btnCancelarModoEdicaoProduto');
     const btnConfirmaEntradaProduto = document.getElementById('btnConfirmaEntradaProduto');
-
     if (!estaEditando) {
-
       btnModoEdicaoEntProduto?.classList.remove('d-none');
       btnCancelarModoEdicaoProduto?.classList.add('d-none');
       btnConfirmaEntradaProduto?.classList.add('d-none');
-
     } else {
-
       btnModoEdicaoEntProduto?.classList.add('d-none');
       btnCancelarModoEdicaoProduto?.classList.remove('d-none');
       btnConfirmaEntradaProduto?.classList.remove('d-none');
-
     }
   }, [estaEditando]);
 
@@ -90,9 +84,8 @@ const EntradaProduto = () => {
       qtdeUnitaria: produtoAdiciona.qtdeUnitaria,
       qtdeCaixa: produtoAdiciona.qtdeCaixa,
       barraCodigo: produtoAdiciona.barraCodigo,
-      onRemove: () => {}
+      onRemove: (event: any) => { excluiItem(event.currentTarget) }
     };
-
     setLinhasTabela([...linhasTabela, novaLinha]);
   };
 
@@ -106,8 +99,6 @@ const EntradaProduto = () => {
     const txtCustoCaixaEntrada = document.getElementById('inputCustoCaixaEntradaProduto') as HTMLInputElement;
     const txtPrecoUnitarioEntrada = document.getElementById('inputPrecoUnitarioEntradaProduto') as HTMLInputElement;
     const txtPrecoCaixaEntrada = document.getElementById('inputPrecoCaixaEntradaProduto') as HTMLInputElement;
-
-
     txtBarraEntrada.value = '';
     txtCodigoEntrada.value = '';
     txtDescricaoEntrada.value = '';
@@ -119,13 +110,17 @@ const EntradaProduto = () => {
     txtPrecoCaixaEntrada.value = '';
   };
 
-  async function consultaProduto() {
+  function excluiItem(indexRow: HTMLTableRowElement) {
+    const tableBody = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
+    const indiceRemover = indexRow.rowIndex;
+    tableBody.deleteRow(indiceRemover);
+  };
 
+  async function consultaProduto() {
     if (inputBarraPesquisa.current?.value == '' || inputBarraPesquisa.current?.value == undefined) {
       limpaCampos();
       return;
     };
-
     const txtBarraEntrada = document.getElementById('inputBarraEntradaProduto') as HTMLInputElement;
     const txtCodigoEntrada = document.getElementById('inputCodigoEntradaProduto') as HTMLInputElement;
     const txtDescricaoEntrada = document.getElementById('inputsProdutoEntradaProduto') as HTMLInputElement;
@@ -135,7 +130,6 @@ const EntradaProduto = () => {
     const txtCustoCaixaEntrada = document.getElementById('inputCustoCaixaEntradaProduto') as HTMLInputElement;
     const txtPrecoUnitarioEntrada = document.getElementById('inputPrecoUnitarioEntradaProduto') as HTMLInputElement;
     const txtPrecoCaixaEntrada = document.getElementById('inputPrecoCaixaEntradaProduto') as HTMLInputElement;
-
     try {
       const barraPesquisa = inputBarraPesquisa.current?.value == '' ? '' : inputBarraPesquisa.current?.value;
       const objBarraPesquisa = {
@@ -163,7 +157,6 @@ const EntradaProduto = () => {
         txtPrecoUnitarioEntrada.value = produtoEntrada.precoUnitProduto;
         txtPrecoCaixaEntrada.value = produtoEntrada.precoCaixaProduto;
       };
-
       let produtoFormatado: TableRowProps = {
         codigoProduto: produtoEntrada.codigoProduto,
         descricaoProduto: produtoEntrada.descricaoProduto,
@@ -174,15 +167,19 @@ const EntradaProduto = () => {
         precoUnitProduto: produtoEntrada.precoUnitProduto,
         precoCaixaProduto: produtoEntrada.precoCaixaProduto,
         barraCodigo: barraPesquisa,
-        onRemove: () => {}
+        onRemove: (event) => { excluiItem(event.currentTarget) }
       };
-
       adicionaItem(produtoFormatado);
+      limpaCampos();
     } catch (error) {
       console.error(error);
       toast.error('Produto não encontrado ou não cadastrado para dar entrada! Favor verificar.');
       limpaCampos();
-    }
+    };
+  };
+
+  const handleLimpaTabela = () => {
+    setLinhasTabela([]);
   };
 
   const buscaDatadeHoje = () => {
@@ -364,14 +361,14 @@ const EntradaProduto = () => {
                     setEstaEditando(true)
                   }}
                 >
-
                   Modo Edição
                 </button>
                 <button
                   className="btn btn-info mr-1 d-none"
                   id="btnConfirmaEntradaProduto"
                   onClick={() => {
-                    setEstaEditando(false)
+                    setEstaEditando(false);
+                    handleLimpaTabela();
                   }}
                 >
 
@@ -383,6 +380,7 @@ const EntradaProduto = () => {
                   onClick={() => {
                     setEstaEditando(false);
                     limpaCampos();
+                    handleLimpaTabela();
                   }}
                 >
                   Cancelar
@@ -414,11 +412,10 @@ const EntradaProduto = () => {
                         qtdeUnitaria={linha.qtdeUnitaria}
                         qtdeCaixa={linha.qtdeCaixa}
                         barraCodigo={linha.barraCodigo}
-                        onRemove={() => { }}
+                        onRemove={(event: any) => { excluiItem(event.currentTarget) }}
                       />
                     ))}
                   </tbody>
-
                 </table>
               </div>
             </div>
