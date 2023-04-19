@@ -13,7 +13,6 @@ const EntradaProduto = () => {
   const [dateHoje, setDateHoje] = useState('');
   const [linhasTabela, setLinhasTabela] = useState<TableRowProps[]>([]);
 
-
   interface TableRowProps {
     codigoProduto: string;
     descricaoProduto: string;
@@ -74,7 +73,7 @@ const EntradaProduto = () => {
     }
   }, [estaEditando]);
 
-  const adicionaItem = async (produtoAdiciona: TableRowProps) => { 
+  const adicionaItem = async (produtoAdiciona: TableRowProps) => {
     const novaLinha: TableRowProps = {
       codigoProduto: produtoAdiciona.codigoProduto,
       descricaoProduto: produtoAdiciona.descricaoProduto,
@@ -87,7 +86,15 @@ const EntradaProduto = () => {
       barraCodigo: produtoAdiciona.barraCodigo,
       onRemove: () => {},
     };
-    setLinhasTabela([...linhasTabela, novaLinha]);
+
+    const indiceEncontrado = linhasTabela.findIndex(index => index.barraCodigo = novaLinha.barraCodigo);
+
+    if (indiceEncontrado == -1) {
+      setLinhasTabela([...linhasTabela, novaLinha]);
+    } else {
+      linhasTabela[indiceEncontrado].qtdeCaixa = linhasTabela[indiceEncontrado].qtdeCaixa + novaLinha.qtdeCaixa;
+      linhasTabela[indiceEncontrado].qtdeUnitaria = linhasTabela[indiceEncontrado].qtdeUnitaria + novaLinha.qtdeUnitaria;
+    };
   };
 
   function limpaCampos() {
@@ -165,7 +172,7 @@ const EntradaProduto = () => {
         precoUnitProduto: produtoEntrada.precoUnitProduto,
         precoCaixaProduto: produtoEntrada.precoCaixaProduto,
         barraCodigo: barraPesquisa,
-        onRemove: () => {},
+        onRemove: () => { },
       };
       adicionaItem(produtoFormatado);
       limpaCampos();
@@ -311,7 +318,6 @@ const EntradaProduto = () => {
                   </div>
                 </div>
               </div>
-
               <label htmlFor="inputPrecoUnitarioEntradaProduto" className="col-sm-4">
                 Preço Unitário:
               </label>
@@ -369,7 +375,6 @@ const EntradaProduto = () => {
                     handleLimpaTabela();
                   }}
                 >
-
                   Confirma
                 </button>
                 <button
