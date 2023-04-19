@@ -280,7 +280,7 @@ const Venda = () => {
       setTotalValorLiquidoVendaText(`R$ ` + valorTotVenda.toFixed(2).replace('.', ','));
       setTotalValorBrutoVendaValor(+valorTotVenda);
       setTotalValorBrutoVendaText(`R$ ` + valorTotVenda.toFixed(2).replace('.', ','));
-    }
+    };
 
     meuTableBodyVenda.deleteRow(parseInt(indiceLinhaExclusao));
 

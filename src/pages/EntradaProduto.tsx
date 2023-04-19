@@ -13,6 +13,7 @@ const EntradaProduto = () => {
   const [dateHoje, setDateHoje] = useState('');
   const [linhasTabela, setLinhasTabela] = useState<TableRowProps[]>([]);
 
+
   interface TableRowProps {
     codigoProduto: string;
     descricaoProduto: string;
@@ -40,15 +41,15 @@ const EntradaProduto = () => {
   }: TableRowProps) => {
     return (
       <tr>
-        <td>{codigoProduto}</td>
+        <td style={{ textAlign: 'center' }}>{codigoProduto}</td>
         <td>{descricaoProduto}</td>
-        <td>{qtdeUnitaria}</td>
-        <td>{qtdeCaixa}</td>
-        <td>{custoUnitProduto}</td>
-        <td>{custoCaixaProduto}</td>
-        <td>{precoUnitProduto}</td>
-        <td>{precoCaixaProduto}</td>
-        <td>{barraCodigo}</td>
+        <td style={{ textAlign: 'right' }}>{qtdeUnitaria}</td>
+        <td style={{ textAlign: 'right' }}>{qtdeCaixa}</td>
+        <td style={{ textAlign: 'right' }}>R$ {custoUnitProduto.toFixed(2).replace('.', ',')}</td>
+        <td style={{ textAlign: 'right' }}>R$ {custoCaixaProduto.toFixed(2).replace('.', ',')}</td>
+        <td style={{ textAlign: 'right' }}>R$ {precoUnitProduto.toFixed(2).replace('.', ',')}</td>
+        <td style={{ textAlign: 'right' }}>R$ {precoCaixaProduto.toFixed(2).replace('.', ',')}</td>
+        <td style={{ textAlign: 'center' }}>{barraCodigo}</td>
         <td style={{ textAlign: 'center' }}>
           <button onClick={onRemove}>
             <FontAwesomeIcon icon={faTrash} />
@@ -73,7 +74,7 @@ const EntradaProduto = () => {
     }
   }, [estaEditando]);
 
-  const adicionaItem = async (produtoAdiciona: TableRowProps) => {
+  const adicionaItem = async (produtoAdiciona: TableRowProps) => { 
     const novaLinha: TableRowProps = {
       codigoProduto: produtoAdiciona.codigoProduto,
       descricaoProduto: produtoAdiciona.descricaoProduto,
@@ -84,7 +85,7 @@ const EntradaProduto = () => {
       qtdeUnitaria: produtoAdiciona.qtdeUnitaria,
       qtdeCaixa: produtoAdiciona.qtdeCaixa,
       barraCodigo: produtoAdiciona.barraCodigo,
-      onRemove: (event: any) => { excluiItem(event.currentTarget) }
+      onRemove: () => {},
     };
     setLinhasTabela([...linhasTabela, novaLinha]);
   };
@@ -110,10 +111,8 @@ const EntradaProduto = () => {
     txtPrecoCaixaEntrada.value = '';
   };
 
-  function excluiItem(indexRow: HTMLTableRowElement) {
-    const tableBody = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
-    const indiceRemover = indexRow.rowIndex;
-    tableBody.deleteRow(indiceRemover);
+  function excluiItem(indexRow: number) {
+    setLinhasTabela(linhasTabela.filter((_, i) => i !== indexRow))
   };
 
   async function consultaProduto() {
@@ -137,7 +136,6 @@ const EntradaProduto = () => {
       }
       const response = await api.post('entradaestoque/novaentrada', objBarraPesquisa);
       const produtoEntrada = response.data[0];
-
       if (produtoEntrada.barraCaixaProduto == barraPesquisa) {
         txtCodigoEntrada.value = produtoEntrada.codigoProduto;
         txtDescricaoEntrada.value = produtoEntrada.descricaoProduto;
@@ -167,7 +165,7 @@ const EntradaProduto = () => {
         precoUnitProduto: produtoEntrada.precoUnitProduto,
         precoCaixaProduto: produtoEntrada.precoCaixaProduto,
         barraCodigo: barraPesquisa,
-        onRemove: (event) => { excluiItem(event.currentTarget) }
+        onRemove: () => {},
       };
       adicionaItem(produtoFormatado);
       limpaCampos();
@@ -389,19 +387,19 @@ const EntradaProduto = () => {
               <div className='row col-sm-12 mt-2'>
                 <table id="tabelaEntradaEstoque" className="table table-sm table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44', marginLeft: 9 }}>
                   <thead>
-                    <th>Prod.</th>
+                    <th style={{ textAlign: 'center' }}>Produto</th>
                     <th>Descrição</th>
-                    <th>Qtd. Unit.</th>
-                    <th>Qtd. Caixas</th>
-                    <th>Custo Unit.</th>
-                    <th>Custo Caixas</th>
-                    <th>Preço Unit.</th>
-                    <th>Preço Caixas</th>
-                    <th>Cód. Barras</th>
+                    <th style={{ textAlign: 'right' }}>Qtd. Unit.</th>
+                    <th style={{ textAlign: 'right' }}>Qtd. Caixas</th>
+                    <th style={{ textAlign: 'right' }}>Custo Unit.</th>
+                    <th style={{ textAlign: 'right' }}>Custo Caixas</th>
+                    <th style={{ textAlign: 'right' }}>Preço Unit.</th>
+                    <th style={{ textAlign: 'right' }}>Preço Caixas</th>
+                    <th style={{ textAlign: 'center' }}>Cód. Barras</th>
                     <th style={{ textAlign: 'center' }}>Ações</th>
                   </thead>
-                  <tbody id="tabelaTBody">
-                    {linhasTabela.map((linha: TableRowProps) => (
+                  <tbody id="tabelaEntradaEstoque">
+                    {linhasTabela.map((linha: TableRowProps, index: number) => (
                       <TableRow
                         codigoProduto={linha.codigoProduto}
                         descricaoProduto={linha.descricaoProduto}
@@ -412,7 +410,7 @@ const EntradaProduto = () => {
                         qtdeUnitaria={linha.qtdeUnitaria}
                         qtdeCaixa={linha.qtdeCaixa}
                         barraCodigo={linha.barraCodigo}
-                        onRemove={(event: any) => { excluiItem(event.currentTarget) }}
+                        onRemove={() => { excluiItem(index) }}
                       />
                     ))}
                   </tbody>
