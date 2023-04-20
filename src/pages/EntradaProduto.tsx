@@ -38,16 +38,24 @@ const EntradaProduto = () => {
     barraCodigo,
     onRemove
   }: TableRowProps) => {
+    let contador = 0;
+    const idtxtQtdeUnitario = 'txtQuantidadeUnitario' + String(contador);
+    const idtxtQtdeCaixa = 'txtQuantidadeCaixa' + String(contador);
+    const idtxtCustoUnitario = 'txtCustoUnitario' + String(contador);
+    const idtxtCustoCaixa = 'txtCustoCaixa' + String(contador);
+    const idtxtPrecoUnitario = 'txtPrecoUnitario' + String(contador);
+    const idtxtPrecoCaixa = 'txtPrecoCaixa' + String(contador);
+    contador = contador + 1;
     return (
       <tr>
         <td style={{ textAlign: 'center' }}>{codigoProduto}</td>
         <td>{descricaoProduto}</td>
-        <td style={{ textAlign: 'right' }}>{qtdeUnitaria}</td>
-        <td style={{ textAlign: 'right' }}>{qtdeCaixa}</td>
-        <td style={{ textAlign: 'right' }}>R$ {custoUnitProduto.toFixed(2).replace('.', ',')}</td>
-        <td style={{ textAlign: 'right' }}>R$ {custoCaixaProduto.toFixed(2).replace('.', ',')}</td>
-        <td style={{ textAlign: 'right' }}>R$ {precoUnitProduto.toFixed(2).replace('.', ',')}</td>
-        <td style={{ textAlign: 'right' }}>R$ {precoCaixaProduto.toFixed(2).replace('.', ',')}</td>
+        <td id={idtxtQtdeUnitario} style={{ textAlign: 'right' }}>{qtdeUnitaria}</td>
+        <td id={idtxtQtdeCaixa} style={{ textAlign: 'right' }}>{qtdeCaixa}</td>
+        <td id={idtxtCustoUnitario} style={{ textAlign: 'right' }}>R$ {custoUnitProduto.toFixed(2).replace('.', ',')}</td>
+        <td id={idtxtCustoCaixa} style={{ textAlign: 'right' }}>R$ {custoCaixaProduto.toFixed(2).replace('.', ',')}</td>
+        <td id={idtxtPrecoUnitario} style={{ textAlign: 'right' }}>R$ {precoUnitProduto.toFixed(2).replace('.', ',')}</td>
+        <td id={idtxtPrecoCaixa} style={{ textAlign: 'right' }}>R$ {precoCaixaProduto.toFixed(2).replace('.', ',')}</td>
         <td style={{ textAlign: 'center' }}>{barraCodigo}</td>
         <td style={{ textAlign: 'center' }}>
           <button onClick={onRemove}>
@@ -84,7 +92,7 @@ const EntradaProduto = () => {
       qtdeUnitaria: produtoAdiciona.qtdeUnitaria,
       qtdeCaixa: produtoAdiciona.qtdeCaixa,
       barraCodigo: produtoAdiciona.barraCodigo,
-      onRemove: () => {},
+      onRemove: () => { },
     };
 
     const indiceEncontrado = linhasTabela.findIndex(index => index.barraCodigo = novaLinha.barraCodigo);
@@ -92,8 +100,14 @@ const EntradaProduto = () => {
     if (indiceEncontrado == -1) {
       setLinhasTabela([...linhasTabela, novaLinha]);
     } else {
-      linhasTabela[indiceEncontrado].qtdeCaixa = linhasTabela[indiceEncontrado].qtdeCaixa + novaLinha.qtdeCaixa;
-      linhasTabela[indiceEncontrado].qtdeUnitaria = linhasTabela[indiceEncontrado].qtdeUnitaria + novaLinha.qtdeUnitaria;
+      const qtdeCaixa = linhasTabela[indiceEncontrado].qtdeCaixa + novaLinha.qtdeCaixa;
+      const qtdeUnitaria = linhasTabela[indiceEncontrado].qtdeUnitaria + novaLinha.qtdeUnitaria;
+      linhasTabela[indiceEncontrado].qtdeCaixa = qtdeCaixa;
+      linhasTabela[indiceEncontrado].qtdeUnitaria = qtdeUnitaria;
+      const txtQuantidadeCaixa = document.getElementById(('txtQuantidadeCaixa' + String(indiceEncontrado))) as HTMLTableCellElement;
+      const txtQuantidadeUnitaria = document.getElementById(('txtQuantidadeUnitario' + String(indiceEncontrado))) as HTMLTableCellElement;
+      txtQuantidadeCaixa.innerHTML = String(qtdeCaixa);
+      txtQuantidadeUnitaria.innerHTML = String(qtdeUnitaria);
     };
   };
 
