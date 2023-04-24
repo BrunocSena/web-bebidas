@@ -626,7 +626,7 @@ const CadProduto = () => {
               </button>
               <button
                 id="btnExcluirCadProduto"
-                className="btn btn-dark mr-1"
+                className="btn btn-danger mr-1"
                 onClick={excluirProduto}
                 >
                 Excluir

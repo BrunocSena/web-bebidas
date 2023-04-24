@@ -12,6 +12,9 @@ const EntradaProduto = () => {
   const [estaEditando, setEstaEditando] = useState(false);
   const [dateHoje, setDateHoje] = useState('');
   const [linhasTabela, setLinhasTabela] = useState<TableRowProps[]>([]);
+  const [qtdeTotUnit, setQtdeTotUnit] = useState(0);
+  const [qtdeTotCaixa, setQtdeTotCaixa] = useState(0);
+  let contadorId = 0;
 
   interface TableRowProps {
     codigoProduto: string;
@@ -38,14 +41,13 @@ const EntradaProduto = () => {
     barraCodigo,
     onRemove
   }: TableRowProps) => {
-    let contador = 0;
-    const idtxtQtdeUnitario = 'txtQuantidadeUnitario' + String(contador);
-    const idtxtQtdeCaixa = 'txtQuantidadeCaixa' + String(contador);
-    const idtxtCustoUnitario = 'txtCustoUnitario' + String(contador);
-    const idtxtCustoCaixa = 'txtCustoCaixa' + String(contador);
-    const idtxtPrecoUnitario = 'txtPrecoUnitario' + String(contador);
-    const idtxtPrecoCaixa = 'txtPrecoCaixa' + String(contador);
-    contador = contador + 1;
+    const idtxtQtdeUnitario = 'txtQuantidadeUnitario' + String(contadorId);
+    const idtxtQtdeCaixa = 'txtQuantidadeCaixa' + String(contadorId);
+    const idtxtCustoUnitario = 'txtCustoUnitario' + String(contadorId);
+    const idtxtCustoCaixa = 'txtCustoCaixa' + String(contadorId);
+    const idtxtPrecoUnitario = 'txtPrecoUnitario' + String(contadorId);
+    const idtxtPrecoCaixa = 'txtPrecoCaixa' + String(contadorId);
+    contadorId = contadorId + 1;
     return (
       <tr>
         <td style={{ textAlign: 'center' }}>{codigoProduto}</td>
@@ -95,19 +97,23 @@ const EntradaProduto = () => {
       onRemove: () => { },
     };
 
-    const indiceEncontrado = linhasTabela.findIndex(index => index.barraCodigo = novaLinha.barraCodigo);
+    const indiceEncontrado = linhasTabela.findIndex(index => index.barraCodigo == novaLinha.barraCodigo);
 
     if (indiceEncontrado == -1) {
       setLinhasTabela([...linhasTabela, novaLinha]);
+      setQtdeTotCaixa((novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa));
+      setQtdeTotUnit((novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria));
     } else {
-      const qtdeCaixa = linhasTabela[indiceEncontrado].qtdeCaixa + novaLinha.qtdeCaixa;
-      const qtdeUnitaria = linhasTabela[indiceEncontrado].qtdeUnitaria + novaLinha.qtdeUnitaria;
+      const qtdeCaixa = linhasTabela[indiceEncontrado].qtdeCaixa + (novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa);
+      const qtdeUnitaria = linhasTabela[indiceEncontrado].qtdeUnitaria + (novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria);
       linhasTabela[indiceEncontrado].qtdeCaixa = qtdeCaixa;
       linhasTabela[indiceEncontrado].qtdeUnitaria = qtdeUnitaria;
       const txtQuantidadeCaixa = document.getElementById(('txtQuantidadeCaixa' + String(indiceEncontrado))) as HTMLTableCellElement;
       const txtQuantidadeUnitaria = document.getElementById(('txtQuantidadeUnitario' + String(indiceEncontrado))) as HTMLTableCellElement;
       txtQuantidadeCaixa.innerHTML = String(qtdeCaixa);
       txtQuantidadeUnitaria.innerHTML = String(qtdeUnitaria);
+      setQtdeTotCaixa(qtdeTotCaixa + (novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa));
+      setQtdeTotUnit(qtdeTotUnit + (novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria));
     };
   };
 
@@ -297,36 +303,36 @@ const EntradaProduto = () => {
                   <div className="col-sm-3">
                     <input
                       type="number"
-                      className="form-control"
+                      className="form-control text-right"
                       id="inputQtdeUnitariaEntradaProduto"
-                      placeholder="Quantidade Unit."
+                      placeholder="0"
                       disabled={!estaEditando}
                     />
                   </div>
                   <div className="col-sm-3">
                     <input
                       type="number"
-                      className="form-control"
+                      className="form-control text-right"
                       id="inputQtdeCaixaEntradaProduto"
-                      placeholder="Quantidade Caixa"
+                      placeholder="0"
                       disabled={!estaEditando}
                     />
                   </div>
                   <div className="col-sm-3">
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control text-right"
                       id="inputCustoUnitarioEntradaProduto"
-                      placeholder="Custo Unit."
+                      placeholder="R$ 0,00"
                       disabled={!estaEditando}
                     />
                   </div>
                   <div className="col-sm-3">
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control text-right"
                       id="inputCustoCaixaEntradaProduto"
-                      placeholder="Custo em Caixa"
+                      placeholder="R$ 0,00"
                       disabled={!estaEditando}
                     />
                   </div>
@@ -345,18 +351,18 @@ const EntradaProduto = () => {
                 <div className="col-sm-4">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control text-right"
                     id="inputPrecoUnitarioEntradaProduto"
-                    placeholder="Preço Unit."
+                    placeholder="R$ 0,00"
                     disabled={!estaEditando}
                   />
                 </div>
                 <div className="col-sm-4">
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control text-right"
                     id="inputPrecoCaixaEntradaProduto"
-                    placeholder="Preço Caixa"
+                    placeholder="R$ 0,00"
                     disabled={!estaEditando}
                   />
                 </div>
@@ -403,7 +409,7 @@ const EntradaProduto = () => {
                   Cancelar
                 </button>
               </div>
-              <div className='row col-sm-12 mt-2'>
+              <div className='row col-sm-12 mt-2 table-sm-responsive'>
                 <table id="tabelaEntradaEstoque" className="table table-sm table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44', marginLeft: 9 }}>
                   <thead>
                     <th style={{ textAlign: 'center' }}>Produto</th>
@@ -437,6 +443,36 @@ const EntradaProduto = () => {
               </div>
             </div>
             <div className="card-footer">
+              <div className='row col-sm-12'>
+                <label htmlFor="inputQtdeTotalUnitEntrada" className="col-sm-2">
+                  Total Qtde Unitária:
+                </label>
+                <label htmlFor="inputQtdeTotalCaixaEntrada" className="col-sm-2">
+                  Total Qtde Caixa:
+                </label>
+              </div>
+              <div className="row col-sm-12">
+                <div className="col-sm-2">
+                  <input
+                    type="number"
+                    className="form-control text-right"
+                    id="inputQtdeTotalUnitEntrada"
+                    placeholder="0"
+                    value={qtdeTotUnit}
+                    disabled={true}
+                  />
+                </div>
+                <div className="col-sm-2">
+                  <input
+                    type="number"
+                    className="form-control text-right"
+                    id="inputQtdeTotalCaixaEntrada"
+                    placeholder="0"
+                    value={qtdeTotCaixa}
+                    disabled={true}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
