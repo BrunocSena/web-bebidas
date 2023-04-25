@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useRef, useState } from 'react';
 import { ContentHeader } from '@components';
 import { api } from '@app/lib/axios';
@@ -69,9 +68,9 @@ const EntradaProduto = () => {
   };
 
   useEffect(() => {
-    const btnModoEdicaoEntProduto = document.getElementById('btnModoEdicaoEntProduto');
-    const btnCancelarModoEdicaoProduto = document.getElementById('btnCancelarModoEdicaoProduto');
-    const btnConfirmaEntradaProduto = document.getElementById('btnConfirmaEntradaProduto');
+    const btnModoEdicaoEntProduto = document.getElementById('btnModoEdicaoEntProduto') as HTMLButtonElement;
+    const btnCancelarModoEdicaoProduto = document.getElementById('btnCancelarModoEdicaoProduto') as HTMLButtonElement;
+    const btnConfirmaEntradaProduto = document.getElementById('btnConfirmaEntradaProduto') as HTMLButtonElement;
     if (!estaEditando) {
       btnModoEdicaoEntProduto?.classList.remove('d-none');
       btnCancelarModoEdicaoProduto?.classList.add('d-none');
@@ -101,8 +100,8 @@ const EntradaProduto = () => {
 
     if (indiceEncontrado == -1) {
       setLinhasTabela([...linhasTabela, novaLinha]);
-      setQtdeTotCaixa((novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa));
-      setQtdeTotUnit((novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria));
+      setQtdeTotCaixa(qtdeTotCaixa + (novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa));
+      setQtdeTotUnit(qtdeTotUnit+ (novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria));
     } else {
       const qtdeCaixa = linhasTabela[indiceEncontrado].qtdeCaixa + (novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa);
       const qtdeUnitaria = linhasTabela[indiceEncontrado].qtdeUnitaria + (novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria);
@@ -115,6 +114,37 @@ const EntradaProduto = () => {
       setQtdeTotCaixa(qtdeTotCaixa + (novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa));
       setQtdeTotUnit(qtdeTotUnit + (novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria));
     };
+  };
+
+  async function gravaEntrada() {
+    if (linhasTabela.length == 0) {
+      toast.error('Nenhum item foi dado entrada! Impossível gravar entrada. Verifique!');
+      const btnCancelarEntrada = document.getElementById('btnCancelarModoEdicaoProduto') as HTMLButtonElement;
+      const click = new Event('click', { bubbles: true })
+      btnCancelarEntrada.dispatchEvent(click);
+    };
+    try {
+      const ArrayProdutos = [];
+      for (let k in linhasTabela) {
+        const newProduto = {
+          "codigoProdutoEntrada": linhasTabela[k].codigoProduto,
+          "descricaoProdutoEntrada": linhasTabela[k].descricaoProduto,
+          "precoUnitarioItemEntrada": linhasTabela[k].precoUnitProduto,
+          "precoCaixaItemEntrada": linhasTabela[k].precoCaixaProduto,
+          "barraCodigoEntrada": linhasTabela[k].barraCodigo,
+          "qtdeUnitariaEntrada": linhasTabela[k].qtdeUnitaria,
+          "qtdeCaixaEntrada": linhasTabela[k].qtdeCaixa
+        }
+        ArrayProdutos.push(newProduto);
+      };
+      const response = await api.post('entradaestoque/novaentrada', ArrayProdutos);
+      toast.success(response.data.message);
+      return true
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response.data.message);
+      return false
+    }
   };
 
   function limpaCampos() {
@@ -161,7 +191,7 @@ const EntradaProduto = () => {
       const objBarraPesquisa = {
         "codigoBarras": barraPesquisa
       }
-      const response = await api.post('entradaestoque/novaentrada', objBarraPesquisa);
+      const response = await api.post('entradaestoque/consultaproduto', objBarraPesquisa);
       const produtoEntrada = response.data[0];
       if (produtoEntrada.barraCaixaProduto == barraPesquisa) {
         txtCodigoEntrada.value = produtoEntrada.codigoProduto;
@@ -306,7 +336,7 @@ const EntradaProduto = () => {
                       className="form-control text-right"
                       id="inputQtdeUnitariaEntradaProduto"
                       placeholder="0"
-                      disabled={!estaEditando}
+                      disabled={true}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -315,7 +345,7 @@ const EntradaProduto = () => {
                       className="form-control text-right"
                       id="inputQtdeCaixaEntradaProduto"
                       placeholder="0"
-                      disabled={!estaEditando}
+                      disabled={true}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -324,7 +354,7 @@ const EntradaProduto = () => {
                       className="form-control text-right"
                       id="inputCustoUnitarioEntradaProduto"
                       placeholder="R$ 0,00"
-                      disabled={!estaEditando}
+                      disabled={true}
                     />
                   </div>
                   <div className="col-sm-3">
@@ -333,7 +363,7 @@ const EntradaProduto = () => {
                       className="form-control text-right"
                       id="inputCustoCaixaEntradaProduto"
                       placeholder="R$ 0,00"
-                      disabled={!estaEditando}
+                      disabled={true}
                     />
                   </div>
                 </div>
@@ -354,7 +384,7 @@ const EntradaProduto = () => {
                     className="form-control text-right"
                     id="inputPrecoUnitarioEntradaProduto"
                     placeholder="R$ 0,00"
-                    disabled={!estaEditando}
+                    disabled={true}
                   />
                 </div>
                 <div className="col-sm-4">
@@ -363,7 +393,7 @@ const EntradaProduto = () => {
                     className="form-control text-right"
                     id="inputPrecoCaixaEntradaProduto"
                     placeholder="R$ 0,00"
-                    disabled={!estaEditando}
+                    disabled={true}
                   />
                 </div>
                 <div className="col-sm-4">
@@ -390,9 +420,13 @@ const EntradaProduto = () => {
                 <button
                   className="btn btn-info mr-1 d-none"
                   id="btnConfirmaEntradaProduto"
-                  onClick={() => {
-                    setEstaEditando(false);
-                    handleLimpaTabela();
+                  onClick={async () => {
+                    if(await gravaEntrada()) {
+                      handleLimpaTabela();
+                      setQtdeTotCaixa(0);
+                      setQtdeTotUnit(0);
+                      setEstaEditando(false);
+                    };
                   }}
                 >
                   Confirma
@@ -404,6 +438,8 @@ const EntradaProduto = () => {
                     setEstaEditando(false);
                     limpaCampos();
                     handleLimpaTabela();
+                    setQtdeTotCaixa(0);
+                    setQtdeTotUnit(0);
                   }}
                 >
                   Cancelar
