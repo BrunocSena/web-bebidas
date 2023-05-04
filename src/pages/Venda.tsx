@@ -52,7 +52,7 @@ const Venda = () => {
     valorTotalItem?: string;
   }
 
-  const 0,,,handleAdicionaItem = (valorItemTotal: number, produtoFormat: any, ehUnitario: boolean) => {
+  const handleAdicionaItem = (valorItemTotal: number, produtoFormat: any, ehUnitario: boolean) => {
     let objetoHandle: ItemProps = {
       codigoProduto: "",
       qtdeUnitariaItem: 0,
