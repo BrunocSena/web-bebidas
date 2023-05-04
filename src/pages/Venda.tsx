@@ -4,6 +4,8 @@ import { ContentHeader } from '@components';
 import { format } from 'date-fns';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'react-toastify';
+import { api } from '@app/lib/axios';
 
 const Venda = () => {
   const inputDescricaoItem = useRef<HTMLInputElement>(null);
@@ -38,9 +40,10 @@ const Venda = () => {
   const [activeTab, setActiveTab] = useState("tab1");
   const [dateHoje, setDateHoje] = useState('');
   const [itensVenda, setItensVenda] = useState<ItemProps[]>([]);
-  const [idItem, setIdItem] = useState(0);
+  let produtoConsultado;
 
   interface ItemProps {
+    codigoProduto: string;
     descricao?: string;
     qtdeUnitariaItem: number;
     qtdeCaixaItem: number;
@@ -49,17 +52,46 @@ const Venda = () => {
     valorTotalItem?: string;
   }
 
-  const handleAdicionaItem = (valorItemTotal: number) => {
-    let idItemVenda = idItem + 1;
-    setIdItem(idItemVenda);
-    setItensVenda([...itensVenda, {
-      descricao: inputDescricaoItem.current?.value,
-      qtdeUnitariaItem: qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0'),
-      qtdeCaixaItem: qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0'),
-      precoUnitarioItem: inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0'),
-      precoCaixaItem: inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0'),
-      valorTotalItem: valorItemTotal.toFixed(2).replace('.', ',')
-    }]);
+  const 0,,,handleAdicionaItem = (valorItemTotal: number, produtoFormat: any, ehUnitario: boolean) => {
+    let objetoHandle: ItemProps = {
+      codigoProduto: "",
+      qtdeUnitariaItem: 0,
+      qtdeCaixaItem: 0,
+      precoUnitarioItem: 0,
+      precoCaixaItem: 0,
+    };
+
+    if(!ehUnitario) {
+      objetoHandle.codigoProduto = produtoFormat.codigoProduto,
+      objetoHandle.descricao = produtoFormat.descricaoProduto,
+      objetoHandle.qtdeUnitariaItem = Number(produtoFormat.qtdeUnitaria),
+      objetoHandle.qtdeCaixaItem = 0,
+      objetoHandle.precoUnitarioItem = parseFloat(produtoFormat.precoUnitProduto),
+      objetoHandle.precoCaixaItem = 0,
+      objetoHandle.valorTotalItem = valorItemTotal.toFixed(2).replace('.', ',');
+    } else {
+      objetoHandle.codigoProduto = produtoFormat.codigoProduto,
+      objetoHandle.descricao = produtoFormat.descricaoProduto,
+      objetoHandle.qtdeUnitariaItem = Number(produtoFormat.qtdeUnitaria),
+      objetoHandle.qtdeCaixaItem = 0,
+      objetoHandle.precoUnitarioItem = parseFloat(produtoFormat.precoUnitProduto),
+      objetoHandle.precoCaixaItem = 0,
+      objetoHandle.valorTotalItem = valorItemTotal.toFixed(2).replace('.', ',');
+    }
+
+    if(produtoFormat != '') {
+      setItensVenda([...itensVenda,  objetoHandle]);
+    } else {
+      setItensVenda([...itensVenda, {
+        codigoProduto: '0',
+        descricao: inputDescricaoItem.current?.value,
+        qtdeUnitariaItem: qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0'),
+        qtdeCaixaItem: qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0'),
+        precoUnitarioItem: inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0'),
+        precoCaixaItem: inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0'),
+        valorTotalItem: valorItemTotal.toFixed(2).replace('.', ',')
+      }]);
+    }
   };
 
   const voltaATab1 = () => {
@@ -70,6 +102,7 @@ const Venda = () => {
     const rows = itensVenda.map((itemVenda) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
+      <td>${itemVenda.codigoProduto}</td>
       <td>${itemVenda.descricao}</td>
       <td>${itemVenda.qtdeUnitariaItem}</td>
       <td>${itemVenda.qtdeCaixaItem}</td>
@@ -209,7 +242,7 @@ const Venda = () => {
   const handleTabButtonClick = (tabKey: string) => {
     if (tabKey) {
       if (totalValorLiqTudo <= 0) {
-        alert('Não tem nenhum item na venda! Verifique.');
+        toast.error('Não tem nenhum item na venda! Verifique.');
         return;
       } else {
         setActiveTab(tabKey);
@@ -264,18 +297,19 @@ const Venda = () => {
     const linhaSelecionada = document.getElementsByClassName('selected')[0] as HTMLTableRowElement | undefined;
 
     if (linhaSelecionada) {
-      const produtoAretirar = linhaSelecionada.cells[0].textContent;
-      const qtdeUnitariaRetirar = linhaSelecionada.cells[1].textContent;
-      const qtdeCaixaRetirar = linhaSelecionada.cells[2].textContent;
-      const precoUnitRetirar = linhaSelecionada.cells[3].textContent;
-      const precoCaixasRetirar = linhaSelecionada.cells[4].textContent;
-      const valorARetirar = linhaSelecionada.cells[5].textContent;
+      const codigoARetirar = linhaSelecionada.cells[0].textContent;
+      const produtoAretirar = linhaSelecionada.cells[1].textContent;
+      const qtdeUnitariaRetirar = linhaSelecionada.cells[2].textContent;
+      const qtdeCaixaRetirar = linhaSelecionada.cells[3].textContent;
+      const precoUnitRetirar = linhaSelecionada.cells[4].textContent;
+      const precoCaixasRetirar = linhaSelecionada.cells[5].textContent;
+      const valorARetirar = linhaSelecionada.cells[6].textContent;
 
-      const encontraIndice = itensVenda.findIndex((item) => item.descricao == produtoAretirar && String(item.qtdeUnitariaItem) == qtdeUnitariaRetirar && String(item.qtdeCaixaItem) == qtdeCaixaRetirar && String(item.precoCaixaItem) == precoCaixasRetirar && String(item.precoUnitarioItem) == precoUnitRetirar && item.valorTotalItem == valorARetirar);
+      const encontraIndice = itensVenda.findIndex((item) => item.codigoProduto == codigoARetirar && item.descricao == produtoAretirar && String(item.qtdeUnitariaItem) == qtdeUnitariaRetirar && String(item.qtdeCaixaItem) == qtdeCaixaRetirar && String(item.precoCaixaItem) == precoCaixasRetirar && String(item.precoUnitarioItem) == precoUnitRetirar && item.valorTotalItem == valorARetirar);
       itensVenda.splice(encontraIndice, 1);
       setItensVenda(itensVenda);
 
-      const valorTotVenda = (totalValorLiquidoValor - parseFloat(valorARetirar == null ? '0': valorARetirar));
+      const valorTotVenda = (totalValorLiquidoValor - parseFloat(valorARetirar == null ? '0' : valorARetirar));
       setTotaLValorLiquidoVendaValor(+valorTotVenda);
       setTotalValorLiquidoVendaText(`R$ ` + valorTotVenda.toFixed(2).replace('.', ','));
       setTotalValorBrutoVendaValor(+valorTotVenda);
@@ -328,12 +362,12 @@ const Venda = () => {
     const inputAcrescimoValor = document.getElementById('txtAcrescimoValor') as HTMLInputElement;
     const inputAcrescimoPerc = document.getElementById('txtAcrescimoPorcentagem') as HTMLInputElement;
 
-    // inputBarraProduto.value = '';
+    inputBarraProduto.value = '';
     inputDescricao.value = '';
     inputQtdeUnitaria.value = '';
     inputQtdeCaixa.value = '';
-    // inputPrecoUnitario.value = '';
-    // inputPrecoCaixa.value = '';
+    inputPrecoUnitario.value = '';
+    inputPrecoCaixa.value = '';
     inputDescontoValor.value = '';
     inputDescontoPerc.value = '';
     inputAcrescimoValor.value = '';
@@ -356,27 +390,55 @@ const Venda = () => {
     setTotalValorLiq(+totValorLiq);
   };
 
-  const adicionaItem = async () => {
-    const descricaoDoItem = inputDescricaoItem.current?.value;
-    const precoUnitarioDoItem = inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0');
-    const qtdeUnitariaItem = qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0');
-    const qtdeCaixaItem = qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0');
+  const adicionaItem = async (bButton = false, produtoConsulta: any) => {
+    if (bButton) {
+      const codigoProduto = produtoConsulta.codigoProduto;
+      const descricaoProduto = produtoConsulta.descricaoProduto;
+      const qtdeUnitariaProduto = produtoConsulta.qtdeUnitaria;
+      const qtdeCaixaProduto = produtoConsulta.qtdeCaixa;
+      const precoUnitarioProduto = produtoConsulta.precoUnitProduto;
+      const precoCaixaProduto = produtoConsulta.precoCaixaProduto;
+      const barraEhUnitaria = produtoConsulta.barraUnitariaProduto == inputBarraProduto.current?.value ? true : false;
+      let valorTotalItem = 0;
+      let outroItem = [];
 
-    if (qtdeUnitariaItem == 0 && qtdeCaixaItem == 0) {
-      alert('Produto não existe quantidade informada! Verifique.');
-      return;
-    };
+      if (barraEhUnitaria) {
+        valorTotalItem = await calculaValorTotal(Number(qtdeUnitariaProduto), Number(precoUnitarioProduto), 0, 0, 0, 0, 0, 0);
+        outroItem = [codigoProduto, descricaoProduto, qtdeUnitariaProduto, 0, precoUnitarioProduto.toFixed(2).replace('.', ','), (0).toFixed(2).replace('.', ','), valorTotalItem.toFixed(2).replace('.', ',')];
+        handleAdicionaItem(+valorTotalItem, produtoConsulta, barraEhUnitaria);
+        addInfoDataTable(outroItem);
+        limpaCampos();
+      } else {
+        valorTotalItem = await calculaValorTotal(0, 0, Number(qtdeCaixaProduto), Number(precoCaixaProduto), 0, 0, 0, 0);
+        outroItem = [codigoProduto, descricaoProduto, 0, qtdeCaixaProduto, (0).toFixed(2).replace('.', ','), precoCaixaProduto.toFixed(2).replace('.', ','), valorTotalItem.toFixed(2).replace('.', ',')];
+        handleAdicionaItem(+valorTotalItem, produtoConsulta, barraEhUnitaria);
+        addInfoDataTable(outroItem);
+        limpaCampos();
+      };
 
-    const precoCaixaDoItem = inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0');
-    const descontoPorcentagemItem = descontoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(descontoPorcentagemDoItem.current?.value ?? '0');
-    const descontoValorItem = descontoValorDoItem.current?.value == '' ? 0 : parseFloat(descontoValorDoItem.current?.value ?? '0');
-    const acrescValorItem = acrescimoValorDoItem.current?.value == '' ? 0 : parseFloat(acrescimoValorDoItem.current?.value ?? '0');
-    const acrescPercItem = acrescimoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(acrescimoPorcentagemDoItem.current?.value ?? '0');
-    const valorTotDoItem = await calculaValorTotal(qtdeUnitariaItem, precoUnitarioDoItem, qtdeCaixaItem, precoCaixaDoItem, descontoPorcentagemItem, descontoValorItem, acrescValorItem, acrescPercItem);
-    const maisItem = [descricaoDoItem, qtdeUnitariaItem, qtdeCaixaItem, precoUnitarioDoItem.toFixed(2).replace('.', ','), precoCaixaDoItem.toFixed(2).replace('.', ','), valorTotDoItem.toFixed(2).replace('.', ',')];
-    handleAdicionaItem(valorTotDoItem);
-    addInfoDataTable(maisItem);
-    limpaCampos();
+    } else {
+      const codigoProduto = '0';
+      const descricaoDoItem = inputDescricaoItem.current?.value;
+      const precoUnitarioDoItem = inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0');
+      const qtdeUnitariaItem = qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0');
+      const qtdeCaixaItem = qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0');
+
+      if (qtdeUnitariaItem == 0 && qtdeCaixaItem == 0) {
+        alert('Produto não existe quantidade informada! Verifique.');
+        return;
+      };
+
+      const precoCaixaDoItem = inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0');
+      const descontoPorcentagemItem = descontoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(descontoPorcentagemDoItem.current?.value ?? '0');
+      const descontoValorItem = descontoValorDoItem.current?.value == '' ? 0 : parseFloat(descontoValorDoItem.current?.value ?? '0');
+      const acrescValorItem = acrescimoValorDoItem.current?.value == '' ? 0 : parseFloat(acrescimoValorDoItem.current?.value ?? '0');
+      const acrescPercItem = acrescimoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(acrescimoPorcentagemDoItem.current?.value ?? '0');
+      const valorTotDoItem = await calculaValorTotal(qtdeUnitariaItem, precoUnitarioDoItem, qtdeCaixaItem, precoCaixaDoItem, descontoPorcentagemItem, descontoValorItem, acrescValorItem, acrescPercItem);
+      const maisItem = [codigoProduto, descricaoDoItem, qtdeUnitariaItem, qtdeCaixaItem, precoUnitarioDoItem.toFixed(2).replace('.', ','), precoCaixaDoItem.toFixed(2).replace('.', ','), valorTotDoItem.toFixed(2).replace('.', ',')];
+      handleAdicionaItem(valorTotDoItem, '', false);
+      addInfoDataTable(maisItem);
+      limpaCampos();
+    }
   };
 
   async function calculaValorTotal(qtdeUnitaria: number,
@@ -417,6 +479,27 @@ const Venda = () => {
     location.reload();
   };
 
+  async function consultaProduto() {
+    if (inputBarraProduto.current?.value == '' || inputBarraProduto.current?.value == undefined) {
+      limpaCampos();
+      return;
+    };
+
+    try {
+      const barraPesquisa = inputBarraProduto.current?.value == '' ? '' : inputBarraProduto.current?.value;
+      const objBarraPesquisa = {
+        "codigoBarras": barraPesquisa
+      }
+      const response = await api.post('venda/checaProduto', objBarraPesquisa);
+      produtoConsultado = response.data[0];
+      adicionaItem(true, produtoConsultado);
+    } catch (error) {
+      console.error(error);
+      toast.error('Produto não encontrado ou não cadastrado para efetuar a venda! Favor verificar.');
+      limpaCampos();
+    };
+  };
+
   useEffect(() => {
     buscaDatadeHoje();
     inputBarraProduto.current?.focus();
@@ -448,10 +531,20 @@ const Venda = () => {
                       <div className='col-sm-3'>
                         <input
                           className='form-control'
-                          value="987654321"
                           ref={inputBarraProduto}
                           id="txtBarraProduto"
-                          type="text" />
+                          type="text"
+                          onKeyDown={async (event) => {
+                            if (event.key === 'Enter') {
+                              const inputElementPesquisa = event.target as HTMLInputElement;
+                              inputElementPesquisa.blur();
+                            }
+                          }}
+                          onBlur={async () => {
+                            consultaProduto();
+                          }}
+                          placeholder="Barra"
+                        />
                       </div>
                       <div className='col-sm-9'>
                         <input className='form-control' ref={inputDescricaoItem} id="txtDescricaoProduto" type="text" />
@@ -479,10 +572,10 @@ const Venda = () => {
                         <input className='form-control' onFocus={verificaQtdeCaixaItemTaVazio} ref={qtdeCaixaDoItem} id="txtQtdeCaixas" type="number" />
                       </div>
                       <div className='col-sm-3'>
-                        <input className='form-control' disabled={true} ref={inputPrecoUnitarioItem} value="10" id="txtPrecoUnitario" type="number" />
+                        <input className='form-control' ref={inputPrecoUnitarioItem} id="txtPrecoUnitario" type="number" />
                       </div>
                       <div className='col-sm-3'>
-                        <input className='form-control' disabled={true} ref={inputPrecoCaixaItem} value="60" id="txtPrecoCaixas" type="number" />
+                        <input className='form-control' ref={inputPrecoCaixaItem} id="txtPrecoCaixas" type="number" />
                       </div>
                     </div>
                   </div>
@@ -519,7 +612,7 @@ const Venda = () => {
                       <div className='col-sm-6'>
                         <button
                           className="btn btn-info btn-lg pb-1 mr-2"
-                          onClick={async () => { adicionaItem() }}
+                          onClick={async () => { adicionaItem(false, '') }}
                           id="btnAdicionaItem">
                           Adicionar Item
                         </button>
@@ -531,6 +624,7 @@ const Venda = () => {
                   </div>
                   <table id="tabelaItensVenda" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>
                     <thead>
+                      <th>Códito</th>
                       <th>Produto</th>
                       <th>Qtde Unit.</th>
                       <th>Qtde Caixas</th>
@@ -561,10 +655,10 @@ const Venda = () => {
                       <label className='col-sm-3'>
                       </label>
                       <div className='col-sm-3'>
-                        <input className='form-control' disabled={true} value={totalQtdeUnitTudo} id="txtTotalQtdeUnitariaVenda" type="number" />
+                        <input className='form-control' value={totalQtdeUnitTudo} id="txtTotalQtdeUnitariaVenda" type="number" />
                       </div>
                       <div className='col-sm-3'>
-                        <input className='form-control' disabled={true} value={totalQtdeCaixasTudo} id="txtTotalQtdeCaixaVenda" type="number" />
+                        <input className='form-control' value={totalQtdeCaixasTudo} id="txtTotalQtdeCaixaVenda" type="number" />
                       </div>
                       <div className='col-sm-3'>
                       </div>
