@@ -68,7 +68,7 @@ const Venda = () => {
       objetoHandle.qtdeCaixaItem = 0,
       objetoHandle.precoUnitarioItem = parseFloat(produtoFormat.precoUnitProduto),
       objetoHandle.precoCaixaItem = 0,
-      objetoHandle.valorTotalItem = valorItemTotal.toFixed(2).replace('.', ',');
+      objetoHandle.valorTotalItem = String(valorItemTotal);
     } else {
       objetoHandle.codigoProduto = produtoFormat.codigoProduto,
       objetoHandle.descricao = produtoFormat.descricaoProduto,
@@ -76,22 +76,33 @@ const Venda = () => {
       objetoHandle.qtdeCaixaItem = 0,
       objetoHandle.precoUnitarioItem = parseFloat(produtoFormat.precoUnitProduto),
       objetoHandle.precoCaixaItem = 0,
-      objetoHandle.valorTotalItem = valorItemTotal.toFixed(2).replace('.', ',');
+      objetoHandle.valorTotalItem = String(valorItemTotal);
     }
 
-    if(produtoFormat != '') {
-      setItensVenda([...itensVenda,  objetoHandle]);
+    const indexProduto = itensVenda.findIndex(i => objetoHandle.codigoProduto == i.codigoProduto)
+
+    if(indexProduto != -1) {
+      const updatedItensVenda = [...itensVenda];
+      const itemToUpdate = updatedItensVenda[indexProduto];
+      itemToUpdate.qtdeUnitariaItem = (+itemToUpdate.qtdeUnitariaItem) + objetoHandle.qtdeUnitariaItem;
+      itemToUpdate.qtdeCaixaItem = (+itemToUpdate.qtdeCaixaItem) + objetoHandle.qtdeCaixaItem;
+      itemToUpdate.valorTotalItem = (parseFloat(itemToUpdate.valorTotalItem ?? '0') + parseFloat(objetoHandle.valorTotalItem ?? '0')).toFixed(2).replace('.', ',');
+      setItensVenda(updatedItensVenda);
     } else {
-      setItensVenda([...itensVenda, {
-        codigoProduto: '0',
-        descricao: inputDescricaoItem.current?.value,
-        qtdeUnitariaItem: qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0'),
-        qtdeCaixaItem: qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0'),
-        precoUnitarioItem: inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0'),
-        precoCaixaItem: inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0'),
-        valorTotalItem: valorItemTotal.toFixed(2).replace('.', ',')
-      }]);
-    }
+      if(produtoFormat != '') {
+        setItensVenda([...itensVenda,  objetoHandle]);
+      } else {
+        setItensVenda([...itensVenda, {
+          codigoProduto: '0',
+          descricao: inputDescricaoItem.current?.value,
+          qtdeUnitariaItem: qtdeUnitariaDoItem.current?.value == '' ? 0 : parseFloat(qtdeUnitariaDoItem.current?.value ?? '0'),
+          qtdeCaixaItem: qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0'),
+          precoUnitarioItem: inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0'),
+          precoCaixaItem: inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0'),
+          valorTotalItem: valorItemTotal.toFixed(2).replace('.', ',')
+        }]);
+      }
+    }    
   };
 
   const voltaATab1 = () => {
@@ -108,16 +119,17 @@ const Venda = () => {
       <td>${itemVenda.qtdeCaixaItem}</td>
       <td>${itemVenda.precoUnitarioItem}</td>
       <td>${itemVenda.precoCaixaItem}</td>
-      <td>${itemVenda.valorTotalItem}</td>
+      <td>${parseFloat((itemVenda.valorTotalItem ?? '0')).toFixed(2).replace('.', ',')}</td>
     `;
 
       tr.addEventListener('click', (event) => {
         const linhaSelecionada = event.currentTarget as HTMLTableRowElement;
         const indiceLinhaSelecionada = linhaSelecionada.rowIndex;
-        const linhaQueJaEstavaSelecionada = document.querySelector('.selected');
+        const linhaQueJaEstavaSelecionada = document.querySelector('.selected') as HTMLTableRowElement;
 
         if (linhaQueJaEstavaSelecionada) {
           linhaQueJaEstavaSelecionada.classList.remove('selected');
+          linhaQueJaEstavaSelecionada.style.backgroundColor = '';
         };
 
         linhaSelecionada.classList.add('selected');
@@ -326,27 +338,39 @@ const Venda = () => {
     const myTableItensVenda = document.getElementById('tabelaItensVenda') as HTMLTableElement;
     const myTableItensVendaBody = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
 
-    const sData = myTableItensVendaBody.insertRow();
-    data.forEach((itemVenda) => {
-      const itemNovo = sData.insertCell();
-      itemNovo.innerHTML = itemVenda;
-    });
+    const findIndice = itensVenda.findIndex(indice => data[0] == indice.codigoProduto);
 
-    sData.addEventListener('click', (event) => {
-      const linhaSelecionada = event.currentTarget as HTMLTableRowElement;
-      const indiceLinhaSelecionada = linhaSelecionada.rowIndex;
-      const linhaQueJaEstavaSelecionada = document.querySelector('.selected');
 
-      if (linhaQueJaEstavaSelecionada) {
-        linhaQueJaEstavaSelecionada.classList.remove('selected');
-      };
+    if (findIndice == -1) {
+      const sData = myTableItensVendaBody.insertRow();
+      data.forEach((itemVenda) => {
+        const itemNovo = sData.insertCell();
+        itemNovo.innerHTML = itemVenda;
+      });
 
-      linhaSelecionada.classList.add('selected');
-      linhaSelecionada.style.backgroundColor = 'blue';
-      setIndiceLinhaExclusao(String(indiceLinhaSelecionada));
-    });
-
-    myTableItensVenda.appendChild(myTableItensVendaBody)
+      sData.addEventListener('click', (event) => {
+        const linhaSelecionada = event.currentTarget as HTMLTableRowElement;
+        const indiceLinhaSelecionada = linhaSelecionada.rowIndex;
+        const linhaQueJaEstavaSelecionada = document.querySelector('.selected') as HTMLTableRowElement;
+  
+        if (linhaQueJaEstavaSelecionada) {
+          linhaQueJaEstavaSelecionada.classList.remove('selected');
+          linhaQueJaEstavaSelecionada.style.backgroundColor = '';
+        };
+  
+        linhaSelecionada.classList.add('selected');
+        linhaSelecionada.style.backgroundColor = 'blue';
+        setIndiceLinhaExclusao(String(indiceLinhaSelecionada));
+      });
+      myTableItensVenda.appendChild(myTableItensVendaBody);
+    } else {
+      const totalUnit = parseFloat(myTableItensVendaBody.children[findIndice].children[2].textContent ?? '0'); 
+      myTableItensVendaBody.children[findIndice].children[2].innerHTML = String(totalUnit + parseFloat(data[2]));
+      const totalCaixa = parseFloat(myTableItensVendaBody.children[findIndice].children[3].textContent ?? '0'); 
+      myTableItensVendaBody.children[findIndice].children[3].innerHTML = String(totalCaixa + parseFloat(data[3]));
+      const totalValor = parseFloat(myTableItensVendaBody.children[findIndice].children[6].textContent ?? '0');
+      myTableItensVendaBody.children[findIndice].children[6].innerHTML = (totalValor + parseFloat(data[4]) + parseFloat(data[5])).toFixed(2).replace('.', ',');
+    }
   };
 
   function limpaCampos() {
