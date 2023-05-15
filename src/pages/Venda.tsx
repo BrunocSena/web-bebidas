@@ -64,10 +64,10 @@ const Venda = () => {
     if(!ehUnitario) {
       objetoHandle.codigoProduto = produtoFormat.codigoProduto,
       objetoHandle.descricao = produtoFormat.descricaoProduto,
-      objetoHandle.qtdeUnitariaItem = Number(produtoFormat.qtdeUnitaria),
-      objetoHandle.qtdeCaixaItem = 0,
-      objetoHandle.precoUnitarioItem = parseFloat(produtoFormat.precoUnitProduto),
-      objetoHandle.precoCaixaItem = 0,
+      objetoHandle.qtdeUnitariaItem = 0,
+      objetoHandle.qtdeCaixaItem = Number(produtoFormat.qtdeCaixa),
+      objetoHandle.precoUnitarioItem = 0,
+      objetoHandle.precoCaixaItem = parseFloat(produtoFormat.precoCaixaProduto),
       objetoHandle.valorTotalItem = String(valorItemTotal);
     } else {
       objetoHandle.codigoProduto = produtoFormat.codigoProduto,
@@ -253,7 +253,7 @@ const Venda = () => {
 
   const handleTabButtonClick = (tabKey: string) => {
     if (tabKey) {
-      if (totalValorLiqTudo <= 0) {
+      if (itensVenda.length <= 0) {
         toast.error('Não tem nenhum item na venda! Verifique.');
         return;
       } else {
@@ -399,7 +399,7 @@ const Venda = () => {
     inputAcrescimoValor.value = '';
     inputAcrescimoPerc.value = '';
 
-  }
+  };
 
   async function atualizaTotais(totalAcresc: number, totalDesconto: number, totalValorBruto: number, totalValorLiq: number, totalQtdeUnit: number, totalQtdeCaixas: number) {
     const totListaItensAcresc = (totalAcresc + totalAcrescimo);
@@ -421,7 +421,7 @@ const Venda = () => {
       const codigoProduto = produtoConsulta.codigoProduto;
       const descricaoProduto = produtoConsulta.descricaoProduto;
       const qtdeUnitariaProduto = produtoConsulta.qtdeUnitaria;
-      const qtdeCaixaProduto = produtoConsulta.qtdeCaixa;
+      let qtdeCaixaProduto = produtoConsulta.qtdeCaixa;
       const precoUnitarioProduto = produtoConsulta.precoUnitProduto;
       const precoCaixaProduto = produtoConsulta.precoCaixaProduto;
       const barraEhUnitaria = produtoConsulta.barraUnitariaProduto == inputBarraProduto.current?.value ? true : false;
@@ -435,6 +435,8 @@ const Venda = () => {
         addInfoDataTable(outroItem);
         limpaCampos();
       } else {
+        produtoConsulta.qtdeCaixa = 1;
+        qtdeCaixaProduto = 1;
         valorTotalItem = await calculaValorTotal(0, 0, Number(qtdeCaixaProduto), Number(precoCaixaProduto), 0, 0, 0, 0);
         outroItem = [codigoProduto, descricaoProduto, 0, qtdeCaixaProduto, (0).toFixed(2).replace('.', ','), precoCaixaProduto.toFixed(2).replace('.', ','), valorTotalItem.toFixed(2).replace('.', ',')];
         handleAdicionaItem(+valorTotalItem, produtoConsulta, barraEhUnitaria);
@@ -476,7 +478,7 @@ const Venda = () => {
     acrescimoValorItem: number,
     acrescimoPorcenItem: number) {
     const totSemDescontoUnitario = (qtdeUnitaria * precoUnitarioItem);
-    const totSemDescontoCaixa = (qtdeCaixas * precoCaixaItem);
+    const totSemDescontoCaixa = ((qtdeCaixas <= 0 ? 0 : (qtdeCaixas/qtdeCaixas)) * precoCaixaItem);
     const totSemDesconto = (totSemDescontoCaixa + totSemDescontoUnitario);
     const totValorDescPorcentagemItem = (totSemDesconto * (descontoPorcentagemItem / 100));
     const totValorAcrescPorcentagemItem = (totSemDesconto * (acrescimoPorcenItem / 100));
@@ -518,12 +520,35 @@ const Venda = () => {
       }
       const response = await api.post('venda/checaProduto', objBarraPesquisa);
       produtoConsultado = response.data[0];
+      if (produtoConsultado.length <= 0) {
+        toast.error('Nenhum produto encontrado com esse código de barras! Favor verificar.')
+        return;
+      }
       adicionaItem(true, produtoConsultado);
+      inputBarraProduto.current?.focus();
     } catch (error) {
       console.error(error);
       toast.error('Produto não encontrado ou não cadastrado para efetuar a venda! Favor verificar.');
       limpaCampos();
+      inputBarraProduto.current?.focus();
     };
+  };
+
+  async function gravaVenda() {
+    if (itensVenda.length <= 0) {
+      toast.error('Venda sem nenhum item, favor verificar!');
+      return;
+    }
+
+    const teste = itensVenda;
+    const teste2 = 'alo';
+    setActiveTab('tab1');
+    const meuTableBodyVenda = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
+    meuTableBodyVenda.innerHTML = '';
+  };
+
+  const handleLimpaTabela = () => {
+    setItensVenda([]);
   };
 
   useEffect(() => {
@@ -749,7 +774,7 @@ const Venda = () => {
                       <div className='col-sm-6'>
                         <button
                           className="btn btn-info btn-lg pb-1 mr-2"
-                          onClick={async () => { }}
+                          onClick={async () => { await gravaVenda(); limpaCampos(); handleLimpaTabela(); }}
                           id="btnFechaVenda">
                           Fechar Venda
                         </button>

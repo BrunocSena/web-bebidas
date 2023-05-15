@@ -89,6 +89,7 @@ const SaidaProduto = () => {
     const btnModoEdicaoSaidaProduto = document.getElementById('btnModoEdicaoSaidaProduto') as HTMLButtonElement;
     const btnCancelarModoEdicaoProduto = document.getElementById('btnCancelarModoEdicaoProduto') as HTMLButtonElement;
     const btnConfirmaModoEdicaoProduto = document.getElementById('btnConfirmaModoEdicaoProduto') as HTMLButtonElement;
+    const inputPesquisa = document.getElementById('inputBarraSaidaProduto') as HTMLInputElement;
     if (!estaEditando) {
       btnModoEdicaoSaidaProduto?.classList.remove('d-none');
       btnCancelarModoEdicaoProduto?.classList.add('d-none');
@@ -97,6 +98,7 @@ const SaidaProduto = () => {
       btnModoEdicaoSaidaProduto?.classList.add('d-none');
       btnCancelarModoEdicaoProduto?.classList.remove('d-none');
       btnConfirmaModoEdicaoProduto?.classList.remove('d-none');
+      inputPesquisa.focus();
     }
   }, [estaEditando]);
 
@@ -185,10 +187,12 @@ const SaidaProduto = () => {
       };
       adicionaItem(produtoFormatado);
       limpaCampos();
+      inputBarraPesquisa.current?.focus();
     } catch (error) {
       console.error(error);
       toast.error('Produto não encontrado ou não cadastrado para dar saída! Favor verificar.');
       limpaCampos();
+      inputBarraPesquisa.current?.focus();
     };
   };
 

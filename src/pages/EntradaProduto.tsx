@@ -71,6 +71,7 @@ const EntradaProduto = () => {
     const btnModoEdicaoEntProduto = document.getElementById('btnModoEdicaoEntProduto') as HTMLButtonElement;
     const btnCancelarModoEdicaoProduto = document.getElementById('btnCancelarModoEdicaoProduto') as HTMLButtonElement;
     const btnConfirmaEntradaProduto = document.getElementById('btnConfirmaEntradaProduto') as HTMLButtonElement;
+    const inputPesquisa = document.getElementById('inputBarraEntradaProduto') as HTMLInputElement;
     if (!estaEditando) {
       btnModoEdicaoEntProduto?.classList.remove('d-none');
       btnCancelarModoEdicaoProduto?.classList.add('d-none');
@@ -79,6 +80,8 @@ const EntradaProduto = () => {
       btnModoEdicaoEntProduto?.classList.add('d-none');
       btnCancelarModoEdicaoProduto?.classList.remove('d-none');
       btnConfirmaEntradaProduto?.classList.remove('d-none');
+      inputPesquisa.focus();
+
     }
   }, [estaEditando]);
 
@@ -226,10 +229,12 @@ const EntradaProduto = () => {
       };
       adicionaItem(produtoFormatado);
       limpaCampos();
+      inputBarraPesquisa.current?.focus();
     } catch (error) {
       console.error(error);
       toast.error('Produto não encontrado ou não cadastrado para dar entrada! Favor verificar.');
       limpaCampos();
+      inputBarraPesquisa.current?.focus();
     };
   };
 
@@ -412,7 +417,7 @@ const EntradaProduto = () => {
                   className="btn btn-info"
                   id="btnModoEdicaoEntProduto"
                   onClick={() => {
-                    setEstaEditando(true)
+                    setEstaEditando(true);
                   }}
                 >
                   Modo Edição
