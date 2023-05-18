@@ -69,10 +69,10 @@ const Desperdicio = () => {
   };
 
   function excluiItem(indexRow: number) {
-    setLinhasTabela(linhasTabela.filter((_, i) => i !== indexRow))
+    setLinhasTabela(linhasTabela.filter((_, i) => i !== indexRow));
   };
 
-  const adicionaItem = async (produtoAdiciona: TableRowProps) => {
+  const adicionaItem = async (produtoAdiciona: TableRowProps, codigoBarras: string) => {
     if (produtoAdiciona == undefined) {
       toast.error('Não foi encontrado item nenhum com esse código de barras! Favor verificar.')
       return;
@@ -86,16 +86,16 @@ const Desperdicio = () => {
       custoCaixaProduto: produtoAdiciona.custoCaixaProduto,
       qtdeUnitaria: produtoAdiciona.qtdeUnitaria,
       qtdeCaixa: produtoAdiciona.qtdeCaixa,
-      barraCodigo: produtoAdiciona.barraCodigo,
+      barraCodigo: codigoBarras,
       onRemove: () => { },
     };
 
-    const indiceEncontrado = linhasTabela.findIndex(index => index.barraCodigo == novaLinha.barraCodigo);
+    const indiceEncontrado = linhasTabela.findIndex(index => index.codigoProduto == novaLinha.codigoProduto);
 
     if (indiceEncontrado == -1) {
       setLinhasTabela([...linhasTabela, novaLinha]);
       setQtdeTotCaixa(qtdeTotCaixa + (novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa));
-      setQtdeTotUnit(qtdeTotUnit+ (novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria));
+      setQtdeTotUnit(qtdeTotUnit + (novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria));
     } else {
       const qtdeCaixa = linhasTabela[indiceEncontrado].qtdeCaixa + (novaLinha.qtdeCaixa == null ? 0 : novaLinha.qtdeCaixa);
       const qtdeUnitaria = linhasTabela[indiceEncontrado].qtdeUnitaria + (novaLinha.qtdeUnitaria == null ? 0 : novaLinha.qtdeUnitaria);
@@ -113,7 +113,6 @@ const Desperdicio = () => {
   async function consultaProduto() {
     const inputBarraPesquisa = document.getElementById('inputBarraEntradaProduto') as HTMLInputElement;
     if (inputBarraPesquisa.value == '' || inputBarraPesquisa.value == undefined) {
-      toast.error('Não foi encontrado nenhum produto com esse código de barras! Favor verificar.')
       return;
     };
     try {
@@ -123,11 +122,17 @@ const Desperdicio = () => {
       }
       const response = await api.post('desperdicio/selectproduto', objBarraPesquisa);
       const produtoEntrada = response.data[0];
-      adicionaItem(produtoEntrada);
+      adicionaItem(produtoEntrada, inputBarraPesquisa.value);
+      inputBarraPesquisa.value = '';
+      inputBarraPesquisa.focus();
     } catch (error) {
       console.error(error);
       toast.error('Produto não encontrado ou não cadastrado para registrar desperdício! Favor verificar.');
     };
+  };
+
+  async function gravaDesperdicio () {
+    
   };
 
   const buscaDatadeHoje = () => {
@@ -135,6 +140,19 @@ const Desperdicio = () => {
     const formataData = format(dataDeHoje, 'dd/MM/yyyy');
     setDateHoje(formataData);
   };
+
+  const handleLimpaTabela = () => {
+    setLinhasTabela([]);
+  };
+
+  useEffect(() => {
+    const btnConfirmaDesp = document.getElementById('btnConfirmaDesp') as HTMLButtonElement;
+    if (linhasTabela.length > 0) {
+      btnConfirmaDesp.classList.remove('d-none');
+    } else {
+      btnConfirmaDesp.classList.add('d-none');
+    }
+  }, [linhasTabela]);
 
   useEffect(() => {
     buscaDatadeHoje();
@@ -148,7 +166,7 @@ const Desperdicio = () => {
         <div className="container-fluid">
           <div className="card">
             <div className="card-header">
-              <h3 className="card-title">Cadastro de Desperdício</h3>
+              <h3 className="card-title"><strong> Cadastro de Desperdício</strong></h3>
               <div className="card-tools">
                 <input className='form-control' style={{ textAlign: 'end', width: 120, height: 25 }} type='string' value={dateHoje} disabled={true} />
               </div>
@@ -209,6 +227,14 @@ const Desperdicio = () => {
               </div>
             </div>
             <div className="card-footer">
+              <button
+                className="btn btn-info d-none"
+                id="btnConfirmaDesp"
+                onClick={() => {
+                }}
+              >
+                Confirmar Desp.
+              </button>
             </div>
           </div>
         </div>
