@@ -675,7 +675,7 @@ const Venda = () => {
                   </div>
                   <table id="tabelaItensVenda" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>
                     <thead>
-                      <th>Códito</th>
+                      <th>Código</th>
                       <th>Produto</th>
                       <th>Qtde Unit.</th>
                       <th>Qtde Caixas</th>
