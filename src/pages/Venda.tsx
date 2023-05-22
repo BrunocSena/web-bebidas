@@ -37,6 +37,7 @@ const Venda = () => {
   const [valorAntigoAcrescVenda, setValorAntigoAcrescVenda] = useState(0);
   const [percAntigoAcrescVenda, setPercAntigoAcrescVenda] = useState(0);
   const [indiceLinhaExclusao, setIndiceLinhaExclusao] = useState('');
+  const [proxCodven, setProxCodven] = useState(0);
   const [activeTab, setActiveTab] = useState("tab1");
   const [dateHoje, setDateHoje] = useState('');
   const [itensVenda, setItensVenda] = useState<ItemProps[]>([]);
@@ -49,6 +50,10 @@ const Venda = () => {
     qtdeCaixaItem: number;
     precoUnitarioItem: number;
     precoCaixaItem: number;
+    // percDescItem: number;
+    // valorDescItem: number;
+    // percAcrescItem: number;
+    // valorAcrescItem: number;
     valorTotalItem?: string;
   }
 
@@ -61,27 +66,27 @@ const Venda = () => {
       precoCaixaItem: 0,
     };
 
-    if(!ehUnitario) {
+    if (!ehUnitario) {
       objetoHandle.codigoProduto = produtoFormat.codigoProduto,
-      objetoHandle.descricao = produtoFormat.descricaoProduto,
-      objetoHandle.qtdeUnitariaItem = 0,
-      objetoHandle.qtdeCaixaItem = Number(produtoFormat.qtdeCaixa),
-      objetoHandle.precoUnitarioItem = 0,
-      objetoHandle.precoCaixaItem = parseFloat(produtoFormat.precoCaixaProduto),
-      objetoHandle.valorTotalItem = String(valorItemTotal);
+        objetoHandle.descricao = produtoFormat.descricaoProduto,
+        objetoHandle.qtdeUnitariaItem = 0,
+        objetoHandle.qtdeCaixaItem = Number(produtoFormat.qtdeCaixa),
+        objetoHandle.precoUnitarioItem = 0,
+        objetoHandle.precoCaixaItem = parseFloat(produtoFormat.precoCaixaProduto),
+        objetoHandle.valorTotalItem = String(valorItemTotal);
     } else {
       objetoHandle.codigoProduto = produtoFormat.codigoProduto,
-      objetoHandle.descricao = produtoFormat.descricaoProduto,
-      objetoHandle.qtdeUnitariaItem = Number(produtoFormat.qtdeUnitaria),
-      objetoHandle.qtdeCaixaItem = 0,
-      objetoHandle.precoUnitarioItem = parseFloat(produtoFormat.precoUnitProduto),
-      objetoHandle.precoCaixaItem = 0,
-      objetoHandle.valorTotalItem = String(valorItemTotal);
+        objetoHandle.descricao = produtoFormat.descricaoProduto,
+        objetoHandle.qtdeUnitariaItem = Number(produtoFormat.qtdeUnitaria),
+        objetoHandle.qtdeCaixaItem = 0,
+        objetoHandle.precoUnitarioItem = parseFloat(produtoFormat.precoUnitProduto),
+        objetoHandle.precoCaixaItem = 0,
+        objetoHandle.valorTotalItem = String(valorItemTotal);
     }
 
     const indexProduto = itensVenda.findIndex(i => objetoHandle.codigoProduto == i.codigoProduto)
 
-    if(indexProduto != -1) {
+    if (indexProduto != -1) {
       const updatedItensVenda = [...itensVenda];
       const itemToUpdate = updatedItensVenda[indexProduto];
       itemToUpdate.qtdeUnitariaItem = (+itemToUpdate.qtdeUnitariaItem) + objetoHandle.qtdeUnitariaItem;
@@ -89,8 +94,8 @@ const Venda = () => {
       itemToUpdate.valorTotalItem = (parseFloat(itemToUpdate.valorTotalItem ?? '0') + parseFloat(objetoHandle.valorTotalItem ?? '0')).toFixed(2).replace('.', ',');
       setItensVenda(updatedItensVenda);
     } else {
-      if(produtoFormat != '') {
-        setItensVenda([...itensVenda,  objetoHandle]);
+      if (produtoFormat != '') {
+        setItensVenda([...itensVenda, objetoHandle]);
       } else {
         setItensVenda([...itensVenda, {
           codigoProduto: '0',
@@ -102,7 +107,7 @@ const Venda = () => {
           valorTotalItem: valorItemTotal.toFixed(2).replace('.', ',')
         }]);
       }
-    }    
+    }
   };
 
   const voltaATab1 = () => {
@@ -354,21 +359,21 @@ const Venda = () => {
         const linhaSelecionada = event.currentTarget as HTMLTableRowElement;
         const indiceLinhaSelecionada = linhaSelecionada.rowIndex;
         const linhaQueJaEstavaSelecionada = document.querySelector('.selected') as HTMLTableRowElement;
-  
+
         if (linhaQueJaEstavaSelecionada) {
           linhaQueJaEstavaSelecionada.classList.remove('selected');
           linhaQueJaEstavaSelecionada.style.backgroundColor = '';
         };
-  
+
         linhaSelecionada.classList.add('selected');
         linhaSelecionada.style.backgroundColor = 'blue';
         setIndiceLinhaExclusao(String(indiceLinhaSelecionada));
       });
       myTableItensVenda.appendChild(myTableItensVendaBody);
     } else {
-      const totalUnit = parseFloat(myTableItensVendaBody.children[findIndice].children[2].textContent ?? '0'); 
+      const totalUnit = parseFloat(myTableItensVendaBody.children[findIndice].children[2].textContent ?? '0');
       myTableItensVendaBody.children[findIndice].children[2].innerHTML = String(totalUnit + parseFloat(data[2]));
-      const totalCaixa = parseFloat(myTableItensVendaBody.children[findIndice].children[3].textContent ?? '0'); 
+      const totalCaixa = parseFloat(myTableItensVendaBody.children[findIndice].children[3].textContent ?? '0');
       myTableItensVendaBody.children[findIndice].children[3].innerHTML = String(totalCaixa + parseFloat(data[3]));
       const totalValor = parseFloat(myTableItensVendaBody.children[findIndice].children[6].textContent ?? '0');
       myTableItensVendaBody.children[findIndice].children[6].innerHTML = (totalValor + parseFloat(data[4]) + parseFloat(data[5])).toFixed(2).replace('.', ',');
@@ -478,7 +483,7 @@ const Venda = () => {
     acrescimoValorItem: number,
     acrescimoPorcenItem: number) {
     const totSemDescontoUnitario = (qtdeUnitaria * precoUnitarioItem);
-    const totSemDescontoCaixa = ((qtdeCaixas <= 0 ? 0 : (qtdeCaixas/qtdeCaixas)) * precoCaixaItem);
+    const totSemDescontoCaixa = ((qtdeCaixas <= 0 ? 0 : (qtdeCaixas / qtdeCaixas)) * precoCaixaItem);
     const totSemDesconto = (totSemDescontoCaixa + totSemDescontoUnitario);
     const totValorDescPorcentagemItem = (totSemDesconto * (descontoPorcentagemItem / 100));
     const totValorAcrescPorcentagemItem = (totSemDesconto * (acrescimoPorcenItem / 100));
@@ -541,10 +546,10 @@ const Venda = () => {
     }
 
     const teste = itensVenda;
-    const teste2 = 'alo';
+
     setActiveTab('tab1');
     const meuTableBodyVenda = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
-    meuTableBodyVenda.innerHTML = '';
+    handleLimpaTabela();
   };
 
   const handleLimpaTabela = () => {
@@ -553,8 +558,19 @@ const Venda = () => {
 
   useEffect(() => {
     buscaDatadeHoje();
+    achaMaxCodven();
     inputBarraProduto.current?.focus();
   }, []);
+
+  async function achaMaxCodven() {
+    try {
+      const maximoCodven = await api.post('venda/buscaCodven');
+      toast.success('Próximo código de venda encontrado com sucesso! Código: ' + maximoCodven.data.proximoCodven);
+      setProxCodven(Number(maximoCodven.data.proximoCodven));
+    } catch (error) {
+      toast.error('Próximo código de venda não foi encontrado! Verifique.')
+    };
+  };
 
   return (
     <div id="minhaPagina">
@@ -563,7 +579,7 @@ const Venda = () => {
         <div className="container-fluid">
           <div className="card">
             <div className="card-header">
-              <h3 className="card-title pt-2"><strong>Venda: 1</strong></h3>
+              <h3 className="card-title pt-2"><strong>Venda: {proxCodven}</strong></h3>
               <div className='card-tools'>
                 <input className='form-control' style={{ textAlign: 'end', width: 120 }} type='string' value={dateHoje} disabled={true} />
               </div>
@@ -774,7 +790,7 @@ const Venda = () => {
                       <div className='col-sm-6'>
                         <button
                           className="btn btn-info btn-lg pb-1 mr-2"
-                          onClick={async () => { await gravaVenda(); limpaCampos(); handleLimpaTabela(); }}
+                          onClick={async () => { await gravaVenda(); limpaCampos(); }}
                           id="btnFechaVenda">
                           Fechar Venda
                         </button>
