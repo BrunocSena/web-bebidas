@@ -72,23 +72,54 @@ const Desperdicio = () => {
     setLinhasTabela(linhasTabela.filter((_, i) => i !== indexRow));
   };
 
-  const adicionaItem = async (produtoAdiciona: TableRowProps, codigoBarras: string) => {
+  const adicionaItem = async (produtoAdiciona: any, codigoBarras: string) => {
     if (produtoAdiciona == undefined) {
       toast.error('Não foi encontrado item nenhum com esse código de barras! Favor verificar.')
       return;
     }
-    const novaLinha: TableRowProps = {
-      codigoProduto: produtoAdiciona.codigoProduto,
-      descricaoProduto: produtoAdiciona.descricaoProduto,
-      precoUnitProduto: produtoAdiciona.precoUnitProduto,
-      precoCaixaProduto: produtoAdiciona.precoCaixaProduto,
-      custoUnitProduto: produtoAdiciona.custoUnitProduto,
-      custoCaixaProduto: produtoAdiciona.custoCaixaProduto,
-      qtdeUnitaria: produtoAdiciona.qtdeUnitaria,
-      qtdeCaixa: produtoAdiciona.qtdeCaixa,
-      barraCodigo: codigoBarras,
-      onRemove: () => { },
+
+    let novaLinha: TableRowProps = {
+      codigoProduto: '',
+      custoCaixaProduto: 0,
+      custoUnitProduto: 0,
+      barraCodigo: '',
+      descricaoProduto: '',
+      precoCaixaProduto: 0,
+      precoUnitProduto: 0,
+      qtdeCaixa: 0,
+      qtdeUnitaria: 0,
+      onRemove: () => {},
+
     };
+
+    if (produtoAdiciona.barraUnitariaProduto == codigoBarras) {
+      novaLinha = {
+        codigoProduto: produtoAdiciona.codigoProduto,
+        descricaoProduto: produtoAdiciona.descricaoProduto,
+        precoUnitProduto: produtoAdiciona.precoUnitProduto,
+        precoCaixaProduto: 0,
+        custoUnitProduto: produtoAdiciona.custoUnitProduto,
+        custoCaixaProduto: 0,
+        qtdeUnitaria: produtoAdiciona.qtdeUnitaria,
+        qtdeCaixa: 0,
+        barraCodigo: codigoBarras,
+        onRemove: () => { },
+      } 
+    } else {
+      novaLinha = {
+        codigoProduto: produtoAdiciona.codigoProduto,
+        descricaoProduto: produtoAdiciona.descricaoProduto,
+        precoUnitProduto: 0,
+        precoCaixaProduto: produtoAdiciona.precoCaixaProduto,
+        custoUnitProduto: 0,
+        custoCaixaProduto: produtoAdiciona.custoCaixaProduto,
+        qtdeUnitaria: 0,
+        qtdeCaixa: produtoAdiciona.qtdeCaixa,
+        barraCodigo: codigoBarras,
+        onRemove: () => { },
+      } 
+    }
+
 
     const indiceEncontrado = linhasTabela.findIndex(index => index.codigoProduto == novaLinha.codigoProduto);
 
@@ -131,8 +162,15 @@ const Desperdicio = () => {
     };
   };
 
-  async function gravaDesperdicio () {
-    
+  async function gravaDesperdicio() {
+    try {
+      const response = await api.post('desperdicio/novodesperdicio', linhasTabela);
+      toast.success(response.data.message);
+      handleLimpaTabela();
+    } catch (error: any) {
+      console.error(error.message);
+      toast.error(error.response.data.message);
+    }
   };
 
   const buscaDatadeHoje = () => {
@@ -230,7 +268,8 @@ const Desperdicio = () => {
               <button
                 className="btn btn-info d-none"
                 id="btnConfirmaDesp"
-                onClick={() => {
+                onClick={async () => {
+                  await gravaDesperdicio();
                 }}
               >
                 Confirmar Desp.
