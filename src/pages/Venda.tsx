@@ -50,10 +50,10 @@ const Venda = () => {
     qtdeCaixaItem: number;
     precoUnitarioItem: number;
     precoCaixaItem: number;
-    // percDescItem: number;
-    // valorDescItem: number;
-    // percAcrescItem: number;
-    // valorAcrescItem: number;
+    percDescItem: number;
+    valorDescItem: number;
+    percAcrescItem: number;
+    valorAcrescItem: number;
     valorTotalItem?: string;
   }
 
@@ -64,6 +64,11 @@ const Venda = () => {
       qtdeCaixaItem: 0,
       precoUnitarioItem: 0,
       precoCaixaItem: 0,
+      percDescItem: 0,
+      percAcrescItem: 0,
+      valorDescItem: 0,
+      valorAcrescItem: 0,
+      valorTotalItem: '0',
     };
 
     if (!ehUnitario) {
@@ -104,7 +109,11 @@ const Venda = () => {
           qtdeCaixaItem: qtdeCaixaDoItem.current?.value == '' ? 0 : parseFloat(qtdeCaixaDoItem.current?.value ?? '0'),
           precoUnitarioItem: inputPrecoUnitarioItem.current?.value == '' ? 0 : parseFloat(inputPrecoUnitarioItem.current?.value ?? '0'),
           precoCaixaItem: inputPrecoCaixaItem.current?.value == '' ? 0 : parseFloat(inputPrecoCaixaItem.current?.value ?? '0'),
-          valorTotalItem: valorItemTotal.toFixed(2).replace('.', ',')
+          valorTotalItem: valorItemTotal.toFixed(2).replace('.', ','),
+          percAcrescItem: acrescimoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(acrescimoPorcentagemDoItem.current?.value ?? '0'),
+          percDescItem: descontoPorcentagemDoItem.current?.value == '' ? 0 : parseFloat(descontoPorcentagemDoItem.current?.value ?? '0'),
+          valorAcrescItem: acrescimoValorDoItem.current?.value == '' ? 0 : parseFloat(acrescimoValorDoItem.current?.value ?? '0'),
+          valorDescItem: descontoValorDoItem.current?.value == '' ? 0 : parseFloat(descontoValorDoItem.current?.value ?? '0'),
         }]);
       }
     }
@@ -393,16 +402,16 @@ const Venda = () => {
     const inputAcrescimoValor = document.getElementById('txtAcrescimoValor') as HTMLInputElement;
     const inputAcrescimoPerc = document.getElementById('txtAcrescimoPorcentagem') as HTMLInputElement;
 
-    inputBarraProduto.value = '';
-    inputDescricao.value = '';
-    inputQtdeUnitaria.value = '';
-    inputQtdeCaixa.value = '';
-    inputPrecoUnitario.value = '';
-    inputPrecoCaixa.value = '';
-    inputDescontoValor.value = '';
-    inputDescontoPerc.value = '';
-    inputAcrescimoValor.value = '';
-    inputAcrescimoPerc.value = '';
+    // inputBarraProduto.value = '';
+    // inputDescricao.value = '';
+    // inputQtdeUnitaria.value = '';
+    // inputQtdeCaixa.value = '';
+    // inputPrecoUnitario.value = '';
+    // inputPrecoCaixa.value = '';
+    // inputDescontoValor.value = '';
+    // inputDescontoPerc.value = '';
+    // inputAcrescimoValor.value = '';
+    // inputAcrescimoPerc.value = '';
 
   };
 
@@ -545,10 +554,29 @@ const Venda = () => {
       return;
     }
 
-    const teste = itensVenda;
+    try {
+      const novaVenda = {
+        "codVen": proxCodven,
+        "valorVendaLiquido": totalValorLiquidoValor,
+        "valorVendaBruto": Number(totalValorBrutoValor),
+        "valorDesconto": Number(totalDescontoValorVenda.current?.value),
+        "valorAcrescimo": Number(totalAcrescimoValorVenda.current?.value),
+        "qtdeTotalUnitaria": Number(totalQtdeUnitTudo),
+        "qtdeTotalCaixa": Number(totalQtdeCaixasTudo),
+        "percDescVenda": Number(totalDescontoPercVenda.current?.value),
+        "percAcrescVenda": Number(totalAcrescimoPercVenda.current?.value),
+        "itensVenda": itensVenda,
+      }
+
+      const responseGravaVenda = await api.post('venda/novavenda', novaVenda);
+
+      toast.success('Venda efetuada com sucesso! Redirecionando...');
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response.data.message);
+    }
 
     setActiveTab('tab1');
-    const meuTableBodyVenda = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
     handleLimpaTabela();
   };
 
