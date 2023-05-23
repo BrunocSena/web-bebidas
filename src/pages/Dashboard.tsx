@@ -25,10 +25,10 @@ const Dashboard = () => {
 
     const vlrVendas = await api.post('dashboard/selectVlrVendas', objDataVendas);
 
-    if(+qtdeVendas.data.vendasFeitas <= 0) {
+    if(qtdeVendas.data.vendasFeitas.length <= 0) {
       setQtdeVendasHoje(0);
     } else {
-      setQtdeVendasHoje(+qtdeVendas.data.vendasFeitas);
+      setQtdeVendasHoje(qtdeVendas.data.vendasFeitas.length);
     };
 
     if(+vlrVendas.data.valorVendas._sum.valorVendaLiquido <= 0) {
@@ -64,7 +64,7 @@ const Dashboard = () => {
             <div className="col-lg-3 col-6">
               <div className="small-box bg-success">
                 <div className="inner">
-                  <h3>{valorVendasHoje}</h3>
+                  <h3>{valorVendasHoje.toFixed(2).replace('.', ',')}</h3>
 
                   <p>R$ Valor Vendido Hoje</p>
                 </div>

@@ -402,16 +402,36 @@ const Venda = () => {
     const inputAcrescimoValor = document.getElementById('txtAcrescimoValor') as HTMLInputElement;
     const inputAcrescimoPerc = document.getElementById('txtAcrescimoPorcentagem') as HTMLInputElement;
 
-    // inputBarraProduto.value = '';
-    // inputDescricao.value = '';
-    // inputQtdeUnitaria.value = '';
-    // inputQtdeCaixa.value = '';
-    // inputPrecoUnitario.value = '';
-    // inputPrecoCaixa.value = '';
-    // inputDescontoValor.value = '';
-    // inputDescontoPerc.value = '';
-    // inputAcrescimoValor.value = '';
-    // inputAcrescimoPerc.value = '';
+    if (inputBarraProduto != null) {
+      inputBarraProduto.value = '';
+    }
+    if (inputDescricao != null) {
+      inputDescricao.value = '';
+    }
+    if (inputQtdeUnitaria != null) {
+      inputQtdeUnitaria.value = '';
+    } 
+    if (inputQtdeCaixa != null) {
+      inputQtdeCaixa.value = '';
+    }
+    if (inputPrecoUnitario != null) {
+      inputPrecoUnitario.value = '';
+    };
+    if (inputPrecoCaixa != null) {
+      inputPrecoCaixa.value = '';
+    }
+    if (inputDescontoValor != null) {
+      inputDescontoValor.value = '';
+    }
+    if (inputDescontoPerc != null) {
+      inputDescontoPerc.value = '';
+    }
+    if (inputAcrescimoValor != null) {
+      inputAcrescimoValor.value = '';
+    }
+    if (inputAcrescimoPerc != null) {
+      inputAcrescimoPerc.value = ''
+    };
 
   };
 
@@ -571,13 +591,13 @@ const Venda = () => {
       const responseGravaVenda = await api.post('venda/novavenda', novaVenda);
 
       toast.success('Venda efetuada com sucesso! Redirecionando...');
+      setActiveTab('tab1');
+      handleLimpaTabela();
+      achaMaxCodven();
     } catch (error: any) {
       console.error(error);
       toast.error(error.response.data.message);
     }
-
-    setActiveTab('tab1');
-    handleLimpaTabela();
   };
 
   const handleLimpaTabela = () => {
