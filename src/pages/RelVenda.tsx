@@ -9,7 +9,7 @@ const RelVenda = () => {
 
   const [periodo, setPeriodo] = useState('dia');
   const [linhasTabela, setLinhasTabela] = useState<TableRowProps[]>([]);
-  const [totalValorVenda, setTotalValorVenda] = useState(0);
+  const [totalValorVenda, setTotalValorVenda] = useState('');
   let valorTotVendas = 0;
 
   interface TableRowProps {
@@ -83,6 +83,7 @@ const RelVenda = () => {
       }
       const responseRelVenda = await api.post('relvenda/consultarelvenda', objDateVenda);
       setLinhasTabela(responseRelVenda.data.vendasPeriodo);
+      setTotalValorVenda(`R$ ` + responseRelVenda.data.totalFiltrado.toFixed(2).replace('.', ','))
     } catch (error) {
       console.error(error);
       toast.error('');
@@ -117,7 +118,7 @@ const RelVenda = () => {
             <div className="card-header col-sm-12 row">
               <div className='col-sm-6 row'>
                 <label htmlFor="selectPeriodo" className="mt-2 col-sm-2">Período: </label>
-                <select className='ml-2 col-sm-3 form-control' id="selectPeriodo" onChange={(event) => {
+                <select className='col-sm-2 form-control' style={{marginLeft: -60}} id="selectPeriodo" onChange={(event) => {
                   setPeriodo(event.currentTarget.value);
                   if (event.currentTarget.value == 'dia') {
                     const dataHj = new Date();
@@ -155,34 +156,38 @@ const RelVenda = () => {
                     await consultaRelVenda();
                   }}
                 ><strong>Consultar</strong></button>
-                <label htmlFor="txtTotalValVenda" id="lblTotalValVenda" className="mt-2 ml-4 col-sm-3">Total Valor Vendas:</label>
-                <input className="form-control col-sm-2"></input>
               </div>
             </div>
             <div className="card-body">
-              <table id="tabelaRelVenda" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>
-                <thead>
-                  <th className="text-center">Venda</th>
-                  <th className="text-center">Data</th>
-                  <th className="text-right">Valor Venda</th>
-                  <th className="text-right">Qtde Total Unitária</th>
-                  <th className="text-right">Qtde Total Caixas</th>
-                </thead>
-                <tbody id="tabelaTBody">
-                  {linhasTabela.map((linha: TableRowProps) => (
-                    valorTotVendas = valorTotVendas + linha.valorVendaLiquido,
-                    console.log(valorTotVendas),
-                    <TableRow
-                      codVen={linha.codVen}
-                      dataVen={linha.dataVen}
-                      qtdeTotalUnitaria={linha.qtdeTotalUnitaria}
-                      qtdeTotalCaixa={linha.qtdeTotalCaixa}
-                      valorVendaBruto={linha.valorVendaBruto}
-                      valorVendaLiquido={linha.valorVendaLiquido}
-                    />
-                  ))}
-                </tbody>
-              </table>
+              <div className='row mb-3'>
+              <label htmlFor="txtTotalValVenda" id="lblTotalValVenda" className="mt-2 ml-4 mr-2">Total Valor Vendas:</label>
+              <input className="form-control col-sm-2" value={totalValorVenda}></input>
+              </div>
+              <div className="row">
+                <table id="tabelaRelVenda" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>
+                  <thead>
+                    <th className="text-center">Venda</th>
+                    <th className="text-center">Data</th>
+                    <th className="text-right">Valor Venda</th>
+                    <th className="text-right">Qtde Total Unitária</th>
+                    <th className="text-right">Qtde Total Caixas</th>
+                  </thead>
+                  <tbody id="tabelaTBody">
+                    {linhasTabela.map((linha: TableRowProps) => (
+                      valorTotVendas = valorTotVendas + linha.valorVendaLiquido,
+                      console.log(valorTotVendas),
+                      <TableRow
+                        codVen={linha.codVen}
+                        dataVen={linha.dataVen}
+                        qtdeTotalUnitaria={linha.qtdeTotalUnitaria}
+                        qtdeTotalCaixa={linha.qtdeTotalCaixa}
+                        valorVendaBruto={linha.valorVendaBruto}
+                        valorVendaLiquido={linha.valorVendaLiquido}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div className="card-footer"></div>
           </div>
