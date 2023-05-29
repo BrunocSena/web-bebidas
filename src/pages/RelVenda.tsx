@@ -118,7 +118,7 @@ const RelVenda = () => {
             <div className="card-header col-sm-12 row">
               <div className='col-sm-6 row'>
                 <label htmlFor="selectPeriodo" className="mt-2 col-sm-2">Período: </label>
-                <select className='col-sm-2 form-control' style={{marginLeft: -60}} id="selectPeriodo" onChange={(event) => {
+                <select className='col-sm-2 form-control' style={{ marginLeft: -60 }} id="selectPeriodo" onChange={(event) => {
                   setPeriodo(event.currentTarget.value);
                   if (event.currentTarget.value == 'dia') {
                     const dataHj = new Date();
@@ -160,8 +160,12 @@ const RelVenda = () => {
             </div>
             <div className="card-body">
               <div className='row mb-3'>
-              <label htmlFor="txtTotalValVenda" id="lblTotalValVenda" className="mt-2 ml-4 mr-2">Total Valor Vendas:</label>
-              <input className="form-control col-sm-2" value={totalValorVenda}></input>
+                <label htmlFor="txtTotalValVenda" id="lblTotalValVenda" className="mt-2 ml-4 mr-2">Total Valor Vendas:</label>
+                <input className="form-control col-sm-2" value={totalValorVenda}></input>
+              </div>
+              <div className='row mb-3'>
+                <label htmlFor="txtTotalValVenda" id="lblTotalValVenda" className="mt-2 ml-4 mr-2">Total Quantidade Vendas:</label>
+                <input className="form-control col-sm-2" value={linhasTabela.length}></input>
               </div>
               <div className="row">
                 <table id="tabelaRelVenda" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>

@@ -42,9 +42,17 @@ export const MENU: IMenuItem[] = [
     name: i18n.t('Relatório de Venda'),
     path: '/relvenda'
   },
+  // {
+  //   name: i18n.t('Lucro x Custo de Produtos'),
+  //   path: '/rellucro'
+  // },
   {
-    name: i18n.t('Lucro x Custo de Produtos'),
-    path: '/rellucro'
+    name: i18n.t('Consulta Produto - Preço/Estoque'),
+    path: '/consultaprod'
+  },
+  {
+    name: i18n.t('Consulta Estoque Loja'),
+    path: '/consultaestoque'
   }
 ];
 
