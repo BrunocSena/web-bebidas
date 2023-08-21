@@ -20,6 +20,7 @@ import RelVenda from './pages/RelVenda';
 import RelLucro from './pages/RelLucro';
 import Desperdicio from './pages/Desperdicio';
 import ConsultaProd from './pages/ConsultaProd'
+import ConsultaProdutosVendidos from './pages/RelProdutosVendidos';
 
 import PublicRoute from './routes/PublicRoute';
 import PrivateRoute from './routes/PrivateRoute';
@@ -62,6 +63,7 @@ const App = () => {
             <Route path="/desperdicio" element={<Desperdicio />} />
             <Route path="/consultaprod" element={<ConsultaProd />} />
             <Route path="/consultaestoque" element={<ConsultaEstoque />} />
+            <Route path="/relprodutovendido" element={<ConsultaProdutosVendidos />} />
             <Route path="/" element={ <Dashboard />} />
           </Route>
         </Route>

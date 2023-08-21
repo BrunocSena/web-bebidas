@@ -53,7 +53,11 @@ export const MENU: IMenuItem[] = [
   {
     name: i18n.t('Consulta Estoque Loja'),
     path: '/consultaestoque'
-  }
+  },
+  {
+    name: i18n.t('Relatório de Produtos Vendidos'),
+    path: '/relprodutovendido'
+  },
 ];
 
 const StyledBrandImage = styled(PfImage)`
