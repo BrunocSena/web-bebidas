@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {useSelector} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {MenuItem} from '@components';
 import {PfImage} from '@profabric/react-components';
 import styled from 'styled-components';
 import i18n from '@app/utils/i18n';
+import { api } from '@app/lib/axios';
 
 export interface IMenuItem {
   name: string;
@@ -78,6 +79,31 @@ const MenuSidebar = () => {
   const sidebarSkin = useSelector((state: any) => state.ui.sidebarSkin);
   const menuItemFlat = useSelector((state: any) => state.ui.menuItemFlat);
   const menuChildIndent = useSelector((state: any) => state.ui.menuChildIndent);
+
+  const NaoParaBackEnd = async () => {
+    try {
+        const response = await api.post('naopara/backend');
+  
+        if (response.data == 'deu boa') {
+          return console.log(1)
+        } else {
+          return console.log(2)
+        }
+  
+    } catch (error: any) {
+      console.error(error);
+      return;
+    }
+  };
+  
+  // setTimeout(NaoParaBackEnd, 50);
+  useEffect(() => {
+    NaoParaBackEnd();
+  
+    const idIntervalo = setInterval(NaoParaBackEnd, 300000);
+  
+    return () => { clearInterval(idIntervalo) };
+  }, []);
 
   return (
     <aside className={`main-sidebar elevation-4 ${sidebarSkin}`}>
