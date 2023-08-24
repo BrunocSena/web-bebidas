@@ -12,7 +12,7 @@ const ConsultaProdutosVendidos = () => {
         const myTableItensVendaBody = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
         myTableItensVendaBody.innerHTML = '';
         try {
-            const response = await api.post('consultaestoque/consultaest')
+            const response = await api.post('relprodutomaisvendido/consulta')
             if (response.data.length <= 0) {
                 toast.error('Nenhum produto encontrado! Verifique.')
                 return;
@@ -20,7 +20,7 @@ const ConsultaProdutosVendidos = () => {
             toast.success('Consulta efetuada com sucesso!');
             const produtos = response.data;
             for (let i in produtos) {
-                addInfoDataTable([produtos[i].codigoProduto, produtos[i].descricaoProduto, produtos[i].qtdeEstoqueUnitaria, produtos[i].qtdeEstoqueCaixa])
+                addInfoDataTable([produtos[i].codVen, produtos[i].codigoProduto, produtos[i].descricaoProduto, produtos[i].qtdeUnitariaItem, produtos[i].precoUnitarioItem, produtos[i].qtdeCaixaItem, produtos[i].precoCaixaItem])
             }
 
         } catch (error: any) {
@@ -32,7 +32,7 @@ const ConsultaProdutosVendidos = () => {
 
     function addInfoDataTable(data: any[]) {
 
-        const myTableItensVenda = document.getElementById('tabelaConsultaEstoque') as HTMLTableElement;
+        const myTableItensVenda = document.getElementById('tabelaProdutosVendidos') as HTMLTableElement;
         const myTableItensVendaBody = document.getElementById('tabelaTBody') as HTMLTableSectionElement;
 
         const sData = myTableItensVendaBody.insertRow();
@@ -59,8 +59,9 @@ const ConsultaProdutosVendidos = () => {
                             </button>
                         </div>
                         <div className="card-body">
-                            <table id="tabelaConsultaEstoque" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>
+                            <table id="tabelaProdutosVendidos" className="table table-lg-responsive table-bordered" style={{ whiteSpace: 'nowrap', backgroundColor: '#343a44' }}>
                                 <thead>
+                                    <th>Venda</th>
                                     <th>Código</th>
                                     <th>Produto</th>
                                     <th className='text-right'>Qtde Unit. Vendida</th>
