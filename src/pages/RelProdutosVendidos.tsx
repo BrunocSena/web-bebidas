@@ -20,7 +20,7 @@ const ConsultaProdutosVendidos = () => {
             toast.success('Consulta efetuada com sucesso!');
             const produtos = response.data;
             for (let i in produtos) {
-                addInfoDataTable([produtos[i].codVen, produtos[i].codigoProduto, produtos[i].descricaoProduto, produtos[i].qtdeUnitariaItem, produtos[i].precoUnitarioItem, produtos[i].qtdeCaixaItem, produtos[i].precoCaixaItem])
+                addInfoDataTable([produtos[i].codVen, produtos[i].codigoProduto, produtos[i].descricaoProduto, produtos[i]._sum[4], produtos[i]._sum[2], produtos[i]._sum[3], produtos[i]._sum[1]])
             }
 
         } catch (error: any) {
